@@ -179,7 +179,7 @@ namespace VHEmpAPI.Controllers
 
         [HttpPost("GetMonthYr_EmpInfo")]
         [Authorize]
-        public async Task<ActionResult<MonthYr_EmpInfo>> GetMonthYr_EmpInfo(LoginIdNum loginIdNum)
+        public async Task<ActionResult<Ddl_Value_Nm>> GetMonthYr_EmpInfo(LoginIdNum loginIdNum)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace VHEmpAPI.Controllers
             }
         }
 
-        [HttpPost("GetEmpAttendDtl_EmpInfo")]
+        [HttpPost("GetMisPunchDtl_EmpInfo")]
         [Authorize]
         public async Task<ActionResult<Resp_MispunchDtl_EmpInfo>> GetMisPunchDtl_EmpInfo(MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
         {
@@ -255,9 +255,9 @@ namespace VHEmpAPI.Controllers
             }
         }
 
-        [HttpPost("GetMisPunchDtl_EmpInfo")]
+        [HttpPost("GetEmpAttendDtl_EmpInfo")]
         [Authorize]
-        public async Task<ActionResult<Resp_MispunchDtl_EmpInfo>> GetEmpAttendDtl_EmpInfo(MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
+        public async Task<ActionResult<Resp_AttDtl_EmpInfo>> GetEmpAttendDtl_EmpInfo(MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
         {
             try
             {
@@ -275,7 +275,7 @@ namespace VHEmpAPI.Controllers
                     }
                 }
 
-                var result = await employeeRepository.GetMisPunchDtl_EmpInfo(Token, mispunchDtl_EmpInfo);
+                var result = await employeeRepository.GetEmpAttendanceDtl_EmpInfo(Token, mispunchDtl_EmpInfo);
                 if (result == null)
                     return NotFound();
 

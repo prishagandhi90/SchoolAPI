@@ -32,10 +32,13 @@ namespace VHEmpAPI.Models
         public DbSet<DashBoardList>? DashboardList { get; set; }
         
         [NotMapped]
-        public DbSet<MonthYr_EmpInfo>? MonthYr_EmpInfo { get; set; }
+        public DbSet<Ddl_Value_Nm>? Ddl_Value_Nm { get; set; }
 
         [NotMapped]
         public DbSet<Resp_MispunchDtl_EmpInfo>? Resp_MispunchDtl_EmpInfo { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_AttDtl_EmpInfo>? Resp_AttDtl_EmpInfo { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

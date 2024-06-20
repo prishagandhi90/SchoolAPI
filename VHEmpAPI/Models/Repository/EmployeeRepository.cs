@@ -77,19 +77,20 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<DashBoardList>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.MonthYr_EmpInfo>> GetMonthYr_EmpInfo()
+        public async Task<IEnumerable<CommonProcOutputFields.Ddl_Value_Nm>> GetMonthYr_EmpInfo()
         {
             try
             {
-                string sqlStr = "exec [webpacepayroll].dbo.GetQuery 'Edit_Att_Mnth_yr', '', '', '' ";
-                var DashboardData = await AppDbContextAdm.MonthYr_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                //string sqlStr = "exec [webpacepayroll].dbo.GetQuery 'Edit_Att_Mnth_yr', '', '', '' ";
+                string sqlStr = "exec dbo.GetMonthYear_EmpInfo ";
+                var DashboardData = await AppDbContextAdm.Ddl_Value_Nm.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
             {
 
             }
-            return (IEnumerable<MonthYr_EmpInfo>)Enumerable.Empty<string>();
+            return (IEnumerable<Ddl_Value_Nm>)Enumerable.Empty<string>();
         }
 
         public async Task<IEnumerable<CommonProcOutputFields.Resp_MispunchDtl_EmpInfo>> GetMisPunchDtl_EmpInfo(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
@@ -106,6 +107,22 @@ namespace VHEmpAPI.Models.Repository
 
             }
             return (IEnumerable<Resp_MispunchDtl_EmpInfo>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_AttDtl_EmpInfo>> GetEmpAttendanceDtl_EmpInfo(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.GetEmpAttDtl_Detail @p_TokenNo = '" + tokenNo + "', " +
+                                "@p_EmpId = '" + mispunchDtl_EmpInfo.EmpId + "', @p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_AttDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_AttDtl_EmpInfo>)Enumerable.Empty<string>();
         }
 
     }

@@ -82,13 +82,13 @@ namespace VHEmpAPI.Shared
             public string? Address { get; set; }
         }
 
-        //[Keyless]
-        //public class UserName
-        //{
-        //    //public string? IsValidToken { get; set; }
-        //    public int? Value { get; set; }
-        //    public string? Name { get; set; }
-        //}
+        [Keyless]
+        public class Ddl_Value_Nm
+        {
+            //public string? IsValidToken { get; set; }
+            public string? Value { get; set; }
+            public string? Name { get; set; }
+        }
 
         //[Keyless]
         //public class LoginAPIs
@@ -97,7 +97,7 @@ namespace VHEmpAPI.Shared
         //    public List<UserName>? Year { get; set; }
         //}
 
-        
+
         [Keyless]
         public class LoginOTP
         {
