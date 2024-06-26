@@ -11,5 +11,6 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Ddl_Value_Nm>> GetMonthYr_EmpInfo();
         Task<IEnumerable<CommonProcOutputFields.Resp_MispunchDtl_EmpInfo>> GetMisPunchDtl_EmpInfo(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo);
         Task<IEnumerable<CommonProcOutputFields.Resp_AttDtl_EmpInfo>> GetEmpAttendanceDtl_EmpInfo(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo);
+        Task<IEnumerable<CommonProcOutputFields.Resp_AttSumm_EmpInfo>> GetEmpAttDtl_Summ(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo);
     }
 }
