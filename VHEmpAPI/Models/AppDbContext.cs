@@ -39,6 +39,9 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_AttDtl_EmpInfo>? Resp_AttDtl_EmpInfo { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_AttSumm_EmpInfo>? Resp_AttSumm_EmpInfo { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

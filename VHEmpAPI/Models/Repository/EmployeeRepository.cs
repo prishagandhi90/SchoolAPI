@@ -20,7 +20,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "select dbo.IsTokenValid('" + TokenNo + "', '" + LoginId + "') ";
+                string sqlStr = "select * from dbo.DrApp_IsTokenValid('" + TokenNo + "', '" + LoginId + "') ";
                 var GetToken = await AppDbContextAdm.IsValidToken.FromSqlRaw(sqlStr).ToListAsync();
                 return GetToken;
             }
@@ -40,7 +40,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.Save_Token_UserCreds_ReturnToken @p_Mobile_No = '" + model.MobileNo + "', " +
+                string sqlStr = "exec dbo.DrApp_Save_Token_UserCreds_ReturnToken @p_Mobile_No = '" + model.MobileNo + "', " +
                                 "@p_TokenNo = '" + TokenNo + "', @p_DeviceType = '" + model.DeviceType + "'," +
                                 "@p_DeviceName = '" + model.DeviceName + "', @p_OSType = '" + model.OSType + "'," +
                                 "@p_DeviceToken = '" + model.DeviceToken + "', @p_UserType = 'EMP' ";
@@ -123,6 +123,22 @@ namespace VHEmpAPI.Models.Repository
 
             }
             return (IEnumerable<Resp_AttDtl_EmpInfo>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_AttSumm_EmpInfo>> GetEmpAttDtl_Summ(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetEmpAttDtl_Summ @p_TokenNo = '" + tokenNo + "', " +
+                                "@p_EmpId = '" + mispunchDtl_EmpInfo.EmpId + "', @p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_AttSumm_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_AttSumm_EmpInfo>)Enumerable.Empty<string>();
         }
 
     }

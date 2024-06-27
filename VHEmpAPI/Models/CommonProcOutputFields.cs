@@ -150,28 +150,28 @@ namespace VHEmpAPI.Shared
         {
             public string? MNTH_YR { get; set; }
             public int? EMPL_CD { get; set; }
-            public DateTime? WRK_DT { get; set; }
-            public string? SHFT_CD { get; set; }
-            public string? USR_SHFT_CD_V { get; set; }
-            public string? USR_SHFT_CD { get; set; }
-            public string? WRK_HRS { get; set; }
-            public string? USR_WRK_HRS { get; set; }
-            public string? OFF_TYP_FLG { get; set; }
-            public string? USR_OFF_TYP_FLG { get; set; }
-            public decimal? OT_MIN { get; set; }
-            public decimal? USR_OT_MIN { get; set; }
-            public decimal? LATE_EARLY_CNT { get; set; }
-            public decimal? USR_LATE_EARLY_CNT { get; set; }
-            public string? ACT_IN_TM { get; set; }
-            public string? ACT_OT_TM { get; set; }
-            public string? ACT_LATE_MARK { get; set; }
-            public string? ACT_EARLY_GOING { get; set; }
-            public decimal? act_late_early_min { get; set; }
-            public decimal? USR_LATE_EARLY_MIN { get; set; }
-            public string? PUNCH_TIME { get; set; }
-            public string? LEAVE_TYP { get; set; }
-            public string? Remark { get; set; }
-            public decimal? OT_ENT_MIN { get; set; }
+            public DateTime? ATT_DATE { get; set; }
+            public string? IN_ { get; set; }
+            public string? OUT { get; set; }
+            public string? PUNCH { get; set; }
+            public string? SHIFT { get; set; }
+            public string? LV { get; set; }
+            public string? ST { get; set; }
+            public string? OT_ENT_MIN { get; set; }
+            public string? OT_MIN { get; set; }
+            public string? LC { get; set; }
+            public string? EG { get; set; }
+            public string? LC_EG_MIN { get; set; }
+            //public string? ACT_IN_TM { get; set; }
+            //public string? ACT_OT_TM { get; set; }
+            //public string? ACT_LATE_MARK { get; set; }
+            //public string? ACT_EARLY_GOING { get; set; }
+            //public decimal? act_late_early_min { get; set; }
+            //public decimal? USR_LATE_EARLY_MIN { get; set; }
+            //public string? PUNCH_TIME { get; set; }
+            //public string? LEAVE_TYP { get; set; }
+            //public string? Remark { get; set; }
+            //public decimal? OT_ENT_MIN { get; set; }
         }
 
         [Keyless]
