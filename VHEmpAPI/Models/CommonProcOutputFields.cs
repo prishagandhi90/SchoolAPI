@@ -150,7 +150,7 @@ namespace VHEmpAPI.Shared
         {
             public string? MNTH_YR { get; set; }
             public int? EMPL_CD { get; set; }
-            public DateTime? ATT_DATE { get; set; }
+            public string? ATT_DATE { get; set; }
             public string? IN_ { get; set; }
             public string? OUT { get; set; }
             public string? PUNCH { get; set; }
