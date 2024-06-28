@@ -3,19 +3,34 @@ using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
-public class NotificationController : ControllerBase
+public class NotificationsController : ControllerBase
 {
-    private readonly FirebaseNotificationService _notificationService;
+    private readonly FirebaseService _firebaseService;
 
-    public NotificationController(FirebaseNotificationService notificationService)
+    public NotificationsController(FirebaseService firebaseService)
     {
-        _notificationService = notificationService;
+        _firebaseService = firebaseService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> SendNotification(string token, string title, string body)
+    [HttpPost("newPatient")]
+    public async Task<IActionResult> NewPatient([FromBody] PatientModel patient)
     {
-        await _notificationService.SendNotificationAsync(token, title, body);
-        return Ok("Notification sent successfully.");
+        var doctorDeviceToken = GetDoctorDeviceToken(patient.DoctorId);
+
+        await _firebaseService.SendNotificationAsync("New Patient Admitted", "A new patient has been admitted.", doctorDeviceToken);
+
+        return Ok("Notification sent.");
     }
+
+    private string GetDoctorDeviceToken(int doctorId)
+    {
+        // Your logic to retrieve the doctor's device token from the database
+        return "doctor_device_token";
+    }
+}
+
+public class PatientModel
+{
+    public int DoctorId { get; set; }
+    public string PatientName { get; set; }
 }

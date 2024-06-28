@@ -1,49 +1,34 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
-public class FirebaseNotificationService
+public class FirebaseService
 {
-    private readonly ILogger<FirebaseNotificationService> _logger;
-    private readonly string _firebaseServerKey;
-    private readonly HttpClient _httpClient;
-
-    public FirebaseNotificationService(ILogger<FirebaseNotificationService> logger, IConfiguration configuration)
+    public FirebaseService()
     {
-        _logger = logger;
-        _firebaseServerKey = configuration["Firebase:ServerKey"];
-        _httpClient = new HttpClient();
+        if (FirebaseApp.DefaultInstance == null)
+        {
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile("path/to/firebase-adminsdk.json")
+            });
+        }
     }
 
-    public async Task SendNotificationAsync(string token, string title, string body)
+    public async Task<string> SendNotificationAsync(string title, string body, string token)
     {
-        var requestUri = "https://fcm.googleapis.com/fcm/send";
-        var notification = new
+        var message = new Message()
         {
-            to = token,
-            notification = new
+            Notification = new Notification()
             {
-                title,
-                body
-            }
+                Title = title,
+                Body = body
+            },
+            Token = token
         };
 
-        var json = JsonConvert.SerializeObject(notification);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        content.Headers.Add("Authorization", $"key={_firebaseServerKey}");
-
-        var response = await _httpClient.PostAsync(requestUri, content);
-
-        if (response.IsSuccessStatusCode)
-        {
-            _logger.LogInformation($"Successfully sent message: {response.Content.ReadAsStringAsync().Result}");
-        }
-        else
-        {
-            _logger.LogError($"Error sending message: {response.ReasonPhrase}");
-        }
+        string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+        return response;
     }
 }

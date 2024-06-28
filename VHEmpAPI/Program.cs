@@ -34,7 +34,7 @@ builder.Services.AddSingleton<IJwtAuth>(new Auth(builder.Configuration["JWT:Key"
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<FirebaseNotificationService>();
+builder.Services.AddSingleton<FirebaseService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
