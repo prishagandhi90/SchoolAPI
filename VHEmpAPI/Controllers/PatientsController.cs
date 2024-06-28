@@ -11,7 +11,7 @@ public class PatientsController : ControllerBase
 
     public PatientsController(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
+        _connectionString = configuration.GetConnectionString("VHMobileDBConnection");
     }
 
     [HttpPost]
