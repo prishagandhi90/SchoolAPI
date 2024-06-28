@@ -5,16 +5,17 @@ using System.Threading.Tasks;
 
 public class FirebaseService
 {
-    public FirebaseService()
-    {
-        if (FirebaseApp.DefaultInstance == null)
-        {
-            FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.FromFile("path/to/firebase-adminsdk.json")
-            });
-        }
-    }
+    //public FirebaseService()
+    //{
+    //    var pathToFirebaseCredentials = Path.Combine(Directory.GetCurrentDirectory(), "FirebaseCredentials", "google-services.json");
+    //    if (FirebaseApp.DefaultInstance == null)
+    //    {
+    //        FirebaseApp.Create(new AppOptions()
+    //        {
+    //            Credential = GoogleCredential.FromFile(pathToFirebaseCredentials)
+    //        });
+    //    }
+    //}
 
     public async Task<string> SendNotificationAsync(string title, string body, string token)
     {

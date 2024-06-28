@@ -18,7 +18,7 @@ public class NotificationService : BackgroundService
         _logger = logger;
         _serviceProvider = serviceProvider;
         _firebaseService = firebaseService;
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
+        _connectionString = configuration.GetConnectionString("VHMobileDBConnection");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
