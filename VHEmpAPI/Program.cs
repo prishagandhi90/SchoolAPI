@@ -32,9 +32,14 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddSingleton<IJwtAuth>(new Auth(builder.Configuration["JWT:Key"], builder.Configuration));
 
 // Add services to the container.
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
+builder.Configuration.GetConnectionString("VHMobileDBConnection")
+));
 
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 builder.Services.AddControllers();
 builder.Services.AddSingleton<FirebaseService>();
+builder.Services.AddHostedService<NotificationService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -65,9 +70,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
-builder.Configuration.GetConnectionString("VHMobileDBConnection")
-));
+
 
 builder.Services.AddScoped<IEmpLoginRepository, EmpLoginRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
