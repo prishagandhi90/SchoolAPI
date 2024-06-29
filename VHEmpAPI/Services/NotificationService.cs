@@ -40,7 +40,8 @@ public class NotificationService : BackgroundService
             {
                 var doctorDeviceToken = GetDoctorDeviceToken(patient.DoctorId);
 
-                await _firebaseService.SendNotificationAsync("New Patient Admitted", $"Patient: {patient.PatientName}", doctorDeviceToken);
+                //await _firebaseService.SendNotificationAsync("New Patient Admitted", $"Patient: {patient.PatientName}", doctorDeviceToken);
+                await _firebaseService.SendNotificationAsync("New Patient Admitted", $"Patient: {patient.PatientName}", patient.DeviceToken);
 
                 patient.Notified = true;
                 await connection.ExecuteAsync("UPDATE PatientNotifications SET Notified = 1 WHERE Id = @Id", new { patient.Id });
@@ -60,5 +61,6 @@ public class PatientNotification
     public int Id { get; set; }
     public int DoctorId { get; set; }
     public string PatientName { get; set; }
+    public string DeviceToken { get; set; }
     public bool Notified { get; set; }
 }
