@@ -12,24 +12,24 @@ using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var firebaseCredentialPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FirebaseCredentials", "exampledemo-7c519-firebase-adminsdk-e29z6-5e5f41cc02.json");
+//var firebaseCredentialPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FirebaseCredentials", "exampledemo-7c519-firebase-adminsdk-e29z6-5e5f41cc02.json");
 
-FirebaseApp firebaseApp = null;
+//FirebaseApp firebaseApp = null;
 
-try
-{
-    firebaseApp = FirebaseApp.Create(new AppOptions
-    {
-        Credential = GoogleCredential.FromFile(firebaseCredentialPath)
-    });
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"FirebaseApp creation error: {ex.Message}");
-    throw; // Handle or rethrow the exception as appropriate
-}
+//try
+//{
+//    firebaseApp = FirebaseApp.Create(new AppOptions
+//    {
+//        Credential = GoogleCredential.FromFile(firebaseCredentialPath)
+//    });
+//}
+//catch (Exception ex)
+//{
+//    Console.WriteLine($"FirebaseApp creation error: {ex.Message}");
+//    throw; // Handle or rethrow the exception as appropriate
+//}
 
-builder.Services.AddSingleton(firebaseApp);
+builder.Services.AddSingleton<FirebaseService>();
 
 builder.Services.AddAuthentication(x =>
 {
