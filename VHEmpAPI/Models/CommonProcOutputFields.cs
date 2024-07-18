@@ -21,6 +21,13 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class LoginId_EmpId
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+        }
+
+        [Keyless]
         public class IsValidData
         {
             public string? IsValid { get; set; }
@@ -31,6 +38,7 @@ namespace VHEmpAPI.Shared
         public class IsValidToken
         {
             public string? IsValid { get; set; }
+            public string? UserId { get; set; }
         }
 
         [Keyless]
@@ -114,6 +122,22 @@ namespace VHEmpAPI.Shared
         public class MonthYr_EmpInfo
         {
             public string? MonthYr { get; set; }
+        }
+
+        [Keyless]
+        public class ret_EmpSummary_Dashboard
+        {
+            public string? EmployeeName { get; set; }
+            public string? EmployeeCode { get; set; }
+            public string? Department { get; set; }
+            //public string? PunchDate { get; set; }
+            public string? InPunchTime { get; set; }
+            public string? OutPunchTime { get; set; }
+            //public string? Direction { get; set; }
+            //public string? TotEGMin { get; set; }
+            //public string? TotLateMin { get; set; }
+            public string? TotLCEGMin { get; set; }
+            public string? cnt { get; set; }
         }
 
         [Keyless]

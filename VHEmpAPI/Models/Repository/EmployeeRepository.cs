@@ -20,7 +20,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "select * from dbo.DrApp_IsTokenValid('" + TokenNo + "', '" + LoginId + "') ";
+                string sqlStr = "select * from dbo.EmpApp_IsTokenValid('" + TokenNo + "', '" + LoginId + "') ";
                 var GetToken = await AppDbContextAdm.IsValidToken.FromSqlRaw(sqlStr).ToListAsync();
                 return GetToken;
             }
@@ -139,6 +139,22 @@ namespace VHEmpAPI.Models.Repository
 
             }
             return (IEnumerable<Resp_AttSumm_EmpInfo>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.ret_EmpSummary_Dashboard>> GetEmpSummary_Dashboard(string EmpId, LoginIdNum loginIdNum)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetEmpSumm_DashData @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + loginIdNum.LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.EmpSummary_Dashboard.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<ret_EmpSummary_Dashboard>)Enumerable.Empty<string>();
         }
 
     }

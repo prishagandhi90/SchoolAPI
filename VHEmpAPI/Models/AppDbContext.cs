@@ -42,7 +42,11 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_AttSumm_EmpInfo>? Resp_AttSumm_EmpInfo { get; set; }
+
+        [NotMapped]
+        public DbSet<ret_EmpSummary_Dashboard>? EmpSummary_Dashboard { get; set; }
         
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
