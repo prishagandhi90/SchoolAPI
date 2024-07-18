@@ -93,12 +93,12 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Ddl_Value_Nm>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_MispunchDtl_EmpInfo>> GetMisPunchDtl_EmpInfo(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_MispunchDtl_EmpInfo>> GetMisPunchDtl_EmpInfo(string EmpId, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
         {
             try
             {
-                string sqlStr = "exec dbo.GetEmpMisPunchDtl_Summ @p_TokenNo = '"+ tokenNo + "', " +
-                                "@p_EmpId = '"+ mispunchDtl_EmpInfo.EmpId + "', @p_MonYr = '"+ mispunchDtl_EmpInfo.MonthYr +"' ";
+                string sqlStr = "exec dbo.GetEmpMisPunchDtl_Summ @p_EmpId = '"+ EmpId + "', " +
+                                "@p_MonYr = '"+ mispunchDtl_EmpInfo.MonthYr +"' ";
                 var DashboardData = await AppDbContextAdm.Resp_MispunchDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }
@@ -109,12 +109,12 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_MispunchDtl_EmpInfo>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_AttDtl_EmpInfo>> GetEmpAttendanceDtl_EmpInfo(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_AttDtl_EmpInfo>> GetEmpAttendanceDtl_EmpInfo(string EmpId, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
         {
             try
             {
-                string sqlStr = "exec dbo.GetEmpAttDtl_Detail @p_TokenNo = '" + tokenNo + "', " +
-                                "@p_EmpId = '" + mispunchDtl_EmpInfo.EmpId + "', @p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                string sqlStr = "exec dbo.GetEmpAttDtl_Detail @p_EmpId = '" + EmpId + "', " +
+                                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
                 var DashboardData = await AppDbContextAdm.Resp_AttDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }
@@ -125,12 +125,12 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_AttDtl_EmpInfo>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_AttSumm_EmpInfo>> GetEmpAttDtl_Summ(string tokenNo, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_AttSumm_EmpInfo>> GetEmpAttDtl_Summ(string EmpId, MispunchDtl_EmpInfo mispunchDtl_EmpInfo)
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetEmpAttDtl_Summ @p_TokenNo = '" + tokenNo + "', " +
-                                "@p_EmpId = '" + mispunchDtl_EmpInfo.EmpId + "', @p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                string sqlStr = "exec dbo.EmpApp_GetEmpAttDtl_Summ @p_EmpId = '" + EmpId + "', " +
+                                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
                 var DashboardData = await AppDbContextAdm.Resp_AttSumm_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }

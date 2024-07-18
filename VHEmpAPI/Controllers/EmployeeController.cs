@@ -222,7 +222,7 @@ namespace VHEmpAPI.Controllers
         {
             try
             {
-                string IsValid = "";
+                string IsValid = "", EmpId = "";
                 var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string Token = WebUtility.UrlDecode(tokenNum);
 
@@ -230,13 +230,14 @@ namespace VHEmpAPI.Controllers
                 if (isValidToken != null)
                 {
                     IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
                     if (IsValid != "Y")
                     {
                         return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
                     }
                 }
 
-                var result = await employeeRepository.GetMisPunchDtl_EmpInfo(Token, mispunchDtl_EmpInfo);
+                var result = await employeeRepository.GetMisPunchDtl_EmpInfo(EmpId, mispunchDtl_EmpInfo);
                 if (result == null)
                     return NotFound();
 
@@ -261,7 +262,7 @@ namespace VHEmpAPI.Controllers
         {
             try
             {
-                string IsValid = "";
+                string IsValid = "", EmpId = "";
                 var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string Token = WebUtility.UrlDecode(tokenNum);
 
@@ -269,13 +270,14 @@ namespace VHEmpAPI.Controllers
                 if (isValidToken != null)
                 {
                     IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
                     if (IsValid != "Y")
                     {
                         return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
                     }
                 }
 
-                var result = await employeeRepository.GetEmpAttendanceDtl_EmpInfo(Token, mispunchDtl_EmpInfo);
+                var result = await employeeRepository.GetEmpAttendanceDtl_EmpInfo(EmpId, mispunchDtl_EmpInfo);
                 if (result == null)
                     return NotFound();
 
@@ -300,7 +302,7 @@ namespace VHEmpAPI.Controllers
         {
             try
             {
-                string IsValid = "";
+                string IsValid = "", EmpId = "";
                 var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string Token = WebUtility.UrlDecode(tokenNum);
 
@@ -308,13 +310,14 @@ namespace VHEmpAPI.Controllers
                 if (isValidToken != null)
                 {
                     IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
                     if (IsValid != "Y")
                     {
                         return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
                     }
                 }
 
-                var result = await employeeRepository.GetEmpAttDtl_Summ(Token, mispunchDtl_EmpInfo);
+                var result = await employeeRepository.GetEmpAttDtl_Summ(EmpId, mispunchDtl_EmpInfo);
                 if (result == null)
                     return NotFound();
 

@@ -206,7 +206,7 @@ namespace VHEmpAPI.Shared
             public string? Department { get; set; }
             public string? Designation { get; set; }
             public string? Emp_Type { get; set; }
-            public DateTime? Dt { get; set; }
+            public string? Dt { get; set; }
             public string? Mis_Punch { get; set; }
             public string? Punch_Time { get; set; }
             public string? ShiftTime { get; set; }
