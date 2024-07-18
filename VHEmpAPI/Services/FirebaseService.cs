@@ -1,7 +1,9 @@
 ﻿using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
+using System;
 using System.Threading.Tasks;
+using VHEmpAPI;
 
 public class FirebaseService
 {
@@ -30,6 +32,19 @@ public class FirebaseService
         });
 
         _messaging = FirebaseMessaging.GetMessaging(firebaseApp);
+
+        //string scopes = "https://www.googleapis.com/auth/firebase.messaging";
+        //var bearertoken = ""; // Bearer Token in this variable
+
+        //using (var stream = new FileStream(firebaseCredentialPath, FileMode.Open, FileAccess.Read))
+        //{
+        //    bearertoken = GoogleCredential
+        //      .FromStream(stream) // Loads key file
+        //      .CreateScoped(scopes) // Gathers scopes requested
+        //      .UnderlyingCredential // Gets the credentials
+        //      .GetAccessTokenForRequestAsync().Result; // Gets the Access Token
+        //}
+
     }
 
     public async Task<string> SendNotificationAsync(string title, string body, string token)

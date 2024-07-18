@@ -14,7 +14,7 @@ public class PatientsController : ControllerBase
         _connectionString = configuration.GetConnectionString("VHMobileDBConnection");
     }
 
-    [HttpPost]
+    [HttpPost("AddPatient")]
     public async Task<IActionResult> AddPatient([FromBody] PatientModel patient)
     {
         using (var connection = new SqlConnection(_connectionString))
