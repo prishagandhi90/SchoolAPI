@@ -143,6 +143,31 @@ namespace VHEmpAPI.Controllers
             return dashboardData;
         }
 
+        [HttpPost("GetDashboardList")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetDashboardList([FromBody] LoginIdNum loginIdNum)
+        {
+            var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            string Token = WebUtility.UrlDecode(tokenNum);
+            if (tokenNum != "")
+            {
+                var dashboardData = await DisplayDashboardList(tokenNum, loginIdNum.LoginId);
+                if (dashboardData != null)
+                {
+                    if (dashboardData.is_valid_token != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+
+                    return Ok(new { statusCode = Ok(dashboardData).StatusCode, isSuccess = "true", message = "Login Successful", data = dashboardData });
+                }
+
+                return Ok(new { statusCode = 400, isSuccess = "false", message = "Bad Request", data = new { } });
+            }
+
+            return new EmptyResult();
+        }
+
         [HttpGet("DisplayDashboardList")]
         public async Task<DashBoardList> DisplayDashboardList(string Token, string LoginId)
         {
@@ -358,6 +383,46 @@ namespace VHEmpAPI.Controllers
                 }
 
                 var result = await employeeRepository.GetEmpSummary_Dashboard(EmpId, loginIdNum);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetLeaveDays")]
+        [Authorize]
+        public async Task<ActionResult<OutSingleString>> GetLeaveDays(GetLeaveDays getLeaveDays)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, getLeaveDays.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.GetLeaveDays(EmpId, getLeaveDays);
                 if (result == null)
                     return NotFound();
 

@@ -157,5 +157,23 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<ret_EmpSummary_Dashboard>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.OutSingleString>> GetLeaveDays(string EmpId, GetLeaveDays getLeaveDays)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveDays @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + getLeaveDays.LoginId + "', " +
+                                "@p_ToDt = '"+ getLeaveDays.LeaveDate + "', " +
+                                "@p_LeaveType = '"+ getLeaveDays.LeaveType +"' ";
+                var DashboardData = await AppDbContextAdm.OutSingleString.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<OutSingleString>)Enumerable.Empty<string>();
+        }
+
     }
 }

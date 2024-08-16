@@ -217,6 +217,22 @@ namespace VHEmpAPI.Shared
             public string? Note { get; set; }
         }
 
+        [Keyless]
+        public class GetLeaveDays
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? LeaveType { get; set; }
+            public string? LeaveDate { get; set; }
+        }
+
+        [Keyless]
+        public class OutSingleString
+        {
+            public string? OutValue { get; set; }
+        }
+
+
     }
 
 }

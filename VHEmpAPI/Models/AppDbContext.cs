@@ -45,7 +45,10 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<ret_EmpSummary_Dashboard>? EmpSummary_Dashboard { get; set; }
-        
+
+        [NotMapped]
+        public DbSet<OutSingleString>? OutSingleString { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
