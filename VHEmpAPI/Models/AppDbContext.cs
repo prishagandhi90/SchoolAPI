@@ -49,7 +49,19 @@ namespace VHEmpAPI.Models
         [NotMapped]
         public DbSet<OutSingleString>? OutSingleString { get; set; }
 
+        [NotMapped]
+        public DbSet<Resp_value_name>? Resp_Value_Name { get; set; }
 
+        [NotMapped]
+        public DbSet<Resp_name>? Resp_Name { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_LvDelayReason>? Resp_LvDelayReason { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_id_name>? Resp_id_name { get; set; }
+
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

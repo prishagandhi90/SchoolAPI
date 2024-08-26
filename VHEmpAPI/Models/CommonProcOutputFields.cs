@@ -232,6 +232,32 @@ namespace VHEmpAPI.Shared
             public string? OutValue { get; set; }
         }
 
+        [Keyless]
+        public class Resp_value_name
+        {
+            public string? Value { get; set; }
+            public string? Name { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_id_name
+        {
+            public string? Id { get; set; }
+            public string? Name { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_name
+        {
+            public string? Name { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_LvDelayReason
+        {
+            public int? Id { get; set; }
+            public string? Name { get; set; }
+        }
 
     }
 

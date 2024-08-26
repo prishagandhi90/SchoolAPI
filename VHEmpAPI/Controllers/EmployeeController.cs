@@ -403,7 +403,7 @@ namespace VHEmpAPI.Controllers
 
         [HttpPost("GetLeaveDays")]
         [Authorize]
-        public async Task<ActionResult<OutSingleString>> GetLeaveDays(GetLeaveDays getLeaveDays)
+        public async Task<ActionResult<dynamic>> GetLeaveDays(GetLeaveDays getLeaveDays)
         {
             try
             {
@@ -423,6 +423,166 @@ namespace VHEmpAPI.Controllers
                 }
 
                 var result = await employeeRepository.GetLeaveDays(EmpId, getLeaveDays);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetLeaveNames")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetLeaveNames(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.GetLeaveNames(EmpId, loginId_EmpId.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetLeaveReason")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetLeaveReason(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.GetLeaveReason(EmpId, loginId_EmpId.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetLeaveDelayReason")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetLeaveDelayReason(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.GetLeaveDelayReason(EmpId, loginId_EmpId.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetLeaveRelieverNm")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetLeaveRelieverNm(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetLeaveRelieverNm(EmpId, loginId_EmpId.LoginId);
                 if (result == null)
                     return NotFound();
 

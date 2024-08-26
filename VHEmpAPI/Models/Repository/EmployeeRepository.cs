@@ -175,5 +175,69 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<OutSingleString>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_value_name>> GetLeaveNames(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveNames @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_value_name>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveReason(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveReason @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LvDelayReason>> GetLeaveDelayReason(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveDelayReason @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_LvDelayReason.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_LvDelayReason>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> EmpApp_GetLeaveRelieverNm(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveRelieverNm @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_id_name>)Enumerable.Empty<string>();
+        }
+
     }
 }
