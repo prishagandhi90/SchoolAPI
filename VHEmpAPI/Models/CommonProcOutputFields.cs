@@ -259,6 +259,49 @@ namespace VHEmpAPI.Shared
             public string? Name { get; set; }
         }
 
+        [Keyless]
+        public class Resp_LvEntryList
+        {
+            public int? LeaveId { get; set; }
+            public string? TypeValue { get; set; }
+            public string? TypeName { get; set; }
+            public string? LeaveFullName { get; set; }
+
+            public string? EmployeeCodeValue { get; set; }
+            public string? EmployeeCodeName { get; set; }
+            public DateTime? FromDate { get; set; }
+            public DateTime? ToDate { get; set; }
+            public decimal? OverTimeMinutes { get; set; }
+            public decimal? LeaveDays { get; set; }
+            public string? Reason { get; set; }
+            public string? HRAction { get; set; }
+            public string? InchargeAction { get; set; }
+            public string? HodAction { get; set; }
+            public string? HRReason { get; set; }
+            public string? InchargeReason { get; set; }
+            public string? HodReason { get; set; }
+            public string? EmpType { get; set; }
+            public string? Department { get; set; }
+            public string? SubDept { get; set; }
+            public string? Note { get; set; }
+            public string? DeptInc { get; set; }
+            public string? DeptHOD { get; set; }
+            public string? SubDeptInc { get; set; }
+            public string? SubDeptHOD { get; set; }
+            public string? InchargeNote { get; set; }
+            public string? HoDNote { get; set; }
+            public string? HRNote { get; set; }
+            public DateTime? EnterDate { get; set; }
+            public string? RelieverEmpCode { get; set; }
+            public string? RelieverEmpName { get; set; }
+            public string? LateReasonId { get; set; }
+            public string? LateReasonName { get; set; }
+            public string? EmpEmail { get; set; }
+            public string? OTHours { get; set; }
+            public string? EmpTel { get; set; }
+            public string? ShiftTime { get; set; }
+
+        }
     }
 
 }

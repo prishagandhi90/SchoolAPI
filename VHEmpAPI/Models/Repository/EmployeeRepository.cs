@@ -239,5 +239,21 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_id_name>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LvEntryList>> EmpApp_GetLeaveEntryList(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveEntryList @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_LvEntryList.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_LvEntryList>)Enumerable.Empty<string>();
+        }
+
     }
 }
