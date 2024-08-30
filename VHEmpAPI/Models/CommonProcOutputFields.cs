@@ -269,8 +269,8 @@ namespace VHEmpAPI.Shared
 
             public string? EmployeeCodeValue { get; set; }
             public string? EmployeeCodeName { get; set; }
-            public DateTime? FromDate { get; set; }
-            public DateTime? ToDate { get; set; }
+            public string? FromDate { get; set; }
+            public string? ToDate { get; set; }
             public decimal? OverTimeMinutes { get; set; }
             public decimal? LeaveDays { get; set; }
             public string? Reason { get; set; }
@@ -291,7 +291,7 @@ namespace VHEmpAPI.Shared
             public string? InchargeNote { get; set; }
             public string? HoDNote { get; set; }
             public string? HRNote { get; set; }
-            public DateTime? EnterDate { get; set; }
+            public string? EnterDate { get; set; }
             public string? RelieverEmpCode { get; set; }
             public string? RelieverEmpName { get; set; }
             public string? LateReasonId { get; set; }
