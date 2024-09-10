@@ -97,8 +97,8 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.GetEmpMisPunchDtl_Summ @p_EmpId = '"+ EmpId + "', " +
-                                "@p_MonYr = '"+ mispunchDtl_EmpInfo.MonthYr +"' ";
+                string sqlStr = "exec dbo.GetEmpMisPunchDtl_Summ @p_EmpId = '" + EmpId + "', " +
+                                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
                 var DashboardData = await AppDbContextAdm.Resp_MispunchDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }
@@ -163,8 +163,8 @@ namespace VHEmpAPI.Models.Repository
             {
                 string sqlStr = "exec dbo.EmpApp_GetLeaveDays @p_EmpId = '" + EmpId + "', " +
                                 "@p_LoginId = '" + getLeaveDays.LoginId + "', " +
-                                "@p_ToDt = '"+ getLeaveDays.LeaveDate + "', " +
-                                "@p_LeaveType = '"+ getLeaveDays.LeaveType +"' ";
+                                "@p_ToDt = '" + getLeaveDays.LeaveDate + "', " +
+                                "@p_LeaveType = '" + getLeaveDays.LeaveType + "' ";
                 var DashboardData = await AppDbContextAdm.OutSingleString.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }
@@ -239,12 +239,12 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_id_name>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_LvEntryList>> EmpApp_GetLeaveEntryList(string EmpId, string LoginId)
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LvEntryList>> EmpApp_GetLeaveEntryList(string EmpId, string LoginId, string Flag)
         {
             try
             {
                 string sqlStr = "exec dbo.EmpApp_GetLeaveEntryList @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
+                                "@p_LoginId = '" + LoginId + "', @p_Flag = '" + Flag + "' ";
                 var DashboardData = await AppDbContextAdm.Resp_LvEntryList.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
             }
@@ -253,6 +253,38 @@ namespace VHEmpAPI.Models.Repository
 
             }
             return (IEnumerable<Resp_LvEntryList>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_SaveLeaveEntryList(string EmpId, SaveLeaveEntry saveLeaveEntry)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_SaveLeaveEntry @p_EmpId = '" + EmpId + "', @p_LoginId = '" + saveLeaveEntry.LoginId + "', " +
+                                "@p_entrytype = '" + saveLeaveEntry.EntryType + "', @p_leaveshortname = '" + saveLeaveEntry.LeaveShortName + "', " +
+                                "@p_leavefullname = '" + saveLeaveEntry.LeaveFullName + "', " +
+                                "@p_fromdate = '" + Convert.ToDateTime(saveLeaveEntry.FromDate).ToString("MM/dd/yyyy hh:mm:ss") + "', " +
+                                "@p_todate = '" + Convert.ToDateTime(saveLeaveEntry.ToDate).ToString("MM/dd/yyyy hh:mm:ss") + "', " +
+                                "@p_reason = '" + saveLeaveEntry.Reason + "', @p_note = '" + saveLeaveEntry.Note + "', " +
+                                "@p_leavedays = '" + saveLeaveEntry.LeaveDays + "', @p_overtimeminutes = '" + saveLeaveEntry.OverTimeMinutes + "', " +
+                                "@p_usr_nm = '" + saveLeaveEntry.Usr_Nm + "', @p_reliever_empcode = '" + saveLeaveEntry.Reliever_Empcode + "', " +
+                                "@p_DelayLVNote = '" + saveLeaveEntry.DelayLVNote + "', @p_Flag = '" + saveLeaveEntry.Flag + "' ";
+                var DashboardData = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
+                return new List<CommonProcOutputFields.SavedYesNo>
+                {
+                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" }
+                };
+                //return DashboardData;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message); // You can log this or save it in DB
+
+                return new List<CommonProcOutputFields.SavedYesNo>
+                {
+                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Error: " + ex.Message }
+                };
+            }
+            return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
         }
 
     }

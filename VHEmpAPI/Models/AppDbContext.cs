@@ -60,8 +60,12 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_id_name>? Resp_id_name { get; set; }
+        
         [NotMapped]
         public DbSet<Resp_LvEntryList>? Resp_LvEntryList { get; set; }
+
+        [NotMapped]
+        public DbSet<SavedYesNo>? SavedYesNo { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

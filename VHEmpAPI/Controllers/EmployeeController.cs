@@ -603,7 +603,7 @@ namespace VHEmpAPI.Controllers
 
         [HttpPost("EmpApp_GetLeaveEntryList")]
         [Authorize]
-        public async Task<ActionResult<dynamic>> EmpApp_GetLeaveEntryList(LoginId_EmpId loginId_EmpId)
+        public async Task<ActionResult<dynamic>> EmpApp_GetLeaveEntryList(LoginId_EmpId_Flag loginId_EmpId_Flag)
         {
             try
             {
@@ -611,7 +611,7 @@ namespace VHEmpAPI.Controllers
                 var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string Token = WebUtility.UrlDecode(tokenNum);
 
-                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId_Flag.LoginId);
                 if (isValidToken != null)
                 {
                     IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
@@ -622,7 +622,7 @@ namespace VHEmpAPI.Controllers
                     }
                 }
 
-                var result = await employeeRepository.EmpApp_GetLeaveEntryList(EmpId, loginId_EmpId.LoginId);
+                var result = await employeeRepository.EmpApp_GetLeaveEntryList(EmpId, loginId_EmpId_Flag.LoginId, loginId_EmpId_Flag.Flag);
                 if (result == null)
                     return NotFound();
 
@@ -635,6 +635,62 @@ namespace VHEmpAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_SaveLeaveEntryList")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_SaveLeaveEntryList(SaveLeaveEntry saveLeaveEntry)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, saveLeaveEntry.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_SaveLeaveEntryList(EmpId, saveLeaveEntry);
+                // Check if result is null
+                if (result == null)
+                    return NotFound(new { statusCode = 404, IsSuccess = "false", Message = "No data found!" });
+
+                // Check if result is empty or status code is not 200
+                if (Ok(result).StatusCode != 200 || !result.Any())
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                // Get the SavedYN value from the result (assuming first entry has SavedYN)
+                var output = result.FirstOrDefault()?.SavedYN;
+
+                // Check if output is not "Y" (indicating an error or non-success response)
+                if (output != "Y")
+                {
+                    // If \r\n exists in output, get the text before it
+                    string finalMessage = output.Contains("\r\n") ? output.Substring(0, output.IndexOf("\r\n")) : output;
+
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = finalMessage, data = new { } });
+                }
+
+                // Return success response if everything is fine
+                return Ok(new { statusCode = 200, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { statusCode = 400, IsSuccess = "false", Message = ex.Message, data = new { } });
+                //return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
             }
             finally
             {

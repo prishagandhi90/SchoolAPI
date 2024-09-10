@@ -272,7 +272,7 @@ namespace VHEmpAPI.Shared
             public string? FromDate { get; set; }
             public string? ToDate { get; set; }
             public decimal? OverTimeMinutes { get; set; }
-            public decimal? LeaveDays { get; set; }
+            public string? LeaveDays { get; set; }
             public string? Reason { get; set; }
             public string? HRAction { get; set; }
             public string? InchargeAction { get; set; }
@@ -300,7 +300,44 @@ namespace VHEmpAPI.Shared
             public string? OTHours { get; set; }
             public string? EmpTel { get; set; }
             public string? ShiftTime { get; set; }
+            public string? InchargeDate { get; set; }
+            public string? HodDate { get; set; }
+            public string? HRDate { get; set; }
 
+        }
+
+        [Keyless]
+        public class LoginId_EmpId_Flag
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? Flag { get; set; }
+        }
+
+        [Keyless]
+        public class SaveLeaveEntry
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? EntryType { get; set; }
+            public string? LeaveShortName { get; set; }
+            public string? LeaveFullName { get; set; }
+            public DateTime? FromDate { get; set; }
+            public DateTime? ToDate { get; set; }
+            public string? Reason { get; set; }
+            public string? Note{ get; set; }
+            public decimal? LeaveDays { get; set; }
+            public decimal? OverTimeMinutes { get; set; }
+            public string? Usr_Nm { get; set; }
+            public string? Reliever_Empcode { get; set; }
+            public string? DelayLVNote {  get; set; }
+            public string? Flag { get; set; }
+        }
+
+        [Keyless]
+        public class SavedYesNo
+        {
+            public string? SavedYN { get; set; }
         }
     }
 
