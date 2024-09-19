@@ -259,11 +259,11 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_SaveLeaveEntry @p_EmpId = '" + EmpId + "', @p_LoginId = '" + saveLeaveEntry.LoginId + "', " +
+                string sqlStr = "exec dbo.EmpApp_SaveLeaveEntry @p_EmpId = '" + EmpId + "', @p_LoginId = '" + saveLeaveEntry.LoginId + "', " +
                                 "@p_entrytype = '" + saveLeaveEntry.EntryType + "', @p_leaveshortname = '" + saveLeaveEntry.LeaveShortName + "', " +
                                 "@p_leavefullname = '" + saveLeaveEntry.LeaveFullName + "', " +
-                                "@p_fromdate = '" + Convert.ToDateTime(saveLeaveEntry.FromDate).ToString("MM/dd/yyyy hh:mm:ss") + "', " +
-                                "@p_todate = '" + Convert.ToDateTime(saveLeaveEntry.ToDate).ToString("MM/dd/yyyy hh:mm:ss") + "', " +
+                                "@p_fromdate = '" + Convert.ToDateTime(saveLeaveEntry.FromDate).ToString("MM/dd/yyyy hh:mm:ss tt") + "', " +
+                                "@p_todate = '" + Convert.ToDateTime(saveLeaveEntry.ToDate).ToString("MM/dd/yyyy hh:mm:ss tt") + "', " +
                                 "@p_reason = '" + saveLeaveEntry.Reason + "', @p_note = '" + saveLeaveEntry.Note + "', " +
                                 "@p_leavedays = '" + saveLeaveEntry.LeaveDays + "', @p_overtimeminutes = '" + saveLeaveEntry.OverTimeMinutes + "', " +
                                 "@p_usr_nm = '" + saveLeaveEntry.Usr_Nm + "', @p_reliever_empcode = '" + saveLeaveEntry.Reliever_Empcode + "', " +

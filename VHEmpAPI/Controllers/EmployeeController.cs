@@ -401,7 +401,7 @@ namespace VHEmpAPI.Controllers
             }
         }
 
-        [HttpPost("GetLeaveDays")]
+        [HttpPost("GetAvlLvCount")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetLeaveDays(GetLeaveDays getLeaveDays)
         {
