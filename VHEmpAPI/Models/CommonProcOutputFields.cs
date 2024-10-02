@@ -190,9 +190,9 @@ namespace VHEmpAPI.Shared
             public string? LC { get; set; }
             public string? EG { get; set; }
             public string? LC_EG_MIN { get; set; }
-            //public string? ACT_IN_TM { get; set; }
-            //public string? ACT_OT_TM { get; set; }
-            //public string? ACT_LATE_MARK { get; set; }
+            public string? RedYN_LC_EG_MIN { get; set; }
+            public string? RedYN_IN_TM { get; set; }
+            public string? RedYN_OUT_TM { get; set; }
             //public string? ACT_EARLY_GOING { get; set; }
             //public decimal? act_late_early_min { get; set; }
             //public decimal? USR_LATE_EARLY_MIN { get; set; }
