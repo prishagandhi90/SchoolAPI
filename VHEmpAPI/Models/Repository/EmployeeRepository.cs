@@ -43,7 +43,8 @@ namespace VHEmpAPI.Models.Repository
                 string sqlStr = "exec dbo.DrApp_Save_Token_UserCreds_ReturnToken @p_Mobile_No = '" + model.MobileNo + "', " +
                                 "@p_TokenNo = '" + TokenNo + "', @p_DeviceType = '" + model.DeviceType + "'," +
                                 "@p_DeviceName = '" + model.DeviceName + "', @p_OSType = '" + model.OSType + "'," +
-                                "@p_DeviceToken = '" + model.DeviceToken + "', @p_UserType = 'EMP' ";
+                                "@p_DeviceId = '" + model.DeviceToken + "', @p_UserType = 'EMP', " +
+                                "@p_FirebaseId = '"+ model.FirebaseId +"' ";
                 var GetToken = await AppDbContextAdm.LoginId_TokenData.FromSqlRaw(sqlStr).ToListAsync();
                 return GetToken;
             }

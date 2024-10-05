@@ -59,6 +59,7 @@ namespace VHEmpAPI.Shared
             public string? DeviceName { get; set; }
             public string? OSType { get; set; }
             public string? DeviceToken { get; set; }
+            public string? FirebaseId { get; set; }
         }
 
         [Keyless]
