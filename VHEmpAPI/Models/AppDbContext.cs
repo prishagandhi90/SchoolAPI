@@ -65,6 +65,9 @@ namespace VHEmpAPI.Models
         public DbSet<Resp_LvEntryList>? Resp_LvEntryList { get; set; }
 
         [NotMapped]
+        public DbSet<Resp_HeaderEntryList>? Resp_HeaderEntryList { get; set; }
+
+        [NotMapped]
         public DbSet<SavedYesNo>? SavedYesNo { get; set; }
         
 

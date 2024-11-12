@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RestSharp;
+using System.Data;
 using System.Net;
+using VHEmpAPI.Interfaces;
 using VHEmpAPI.Shared;
 using static VHEmpAPI.Shared.CommonProcOutputFields;
 
@@ -11,9 +13,12 @@ namespace VHEmpAPI.Models.Repository
     public class EmployeeRepository : IEmployeeRepository
     {
         public AppDbContext AppDbContextAdm { get; }
-        public EmployeeRepository(AppDbContext appDbContext)
+        private readonly IDBMethods _dbMethods;
+
+        public EmployeeRepository(AppDbContext appDbContext, IDBMethods dbm)
         {
             AppDbContextAdm = appDbContext;
+            _dbMethods = dbm ?? throw new ArgumentNullException(nameof(dbm));
         }
 
         public async Task<IEnumerable<CommonProcOutputFields.IsValidToken>> IsTokenValid(string TokenNo, string LoginId)
@@ -256,6 +261,22 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_LvEntryList>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_HeaderEntryList>> EmpApp_GetHeaderList(string EmpId, string LoginId, string Flag)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetHeaderList @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "', @p_Flag = '" + Flag + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_HeaderEntryList.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_HeaderEntryList>)Enumerable.Empty<string>();
+        }
+
         public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_SaveLeaveEntryList(string EmpId, SaveLeaveEntry saveLeaveEntry)
         {
             try
@@ -288,5 +309,51 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_value_name>> EmpApp_GetShiftWeekList(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetShiftWeekList @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_value_name>)Enumerable.Empty<string>();
+        }
+        public async Task<DataTable> GetEmpShiftReport(string EmpId, string LoginId, string DtRange)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetEmpShiftReport @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_DtRange = '"+ DtRange + "' ";
+                //var DashboardData = await AppDbContextAdm.DrDynamicDt.FromSqlRaw(sqlStr).ToListAsync();
+                //return DashboardData;
+
+                DataTable objresutl = new DataTable();
+
+                try
+                {
+                    objresutl = _dbMethods.GetDataTable(sqlStr);
+
+                    return objresutl;
+                }
+                catch (Exception ex)
+                {}
+                finally
+                {
+                }
+                return objresutl;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return new DataTable();
+        }
+
     }
+
 }

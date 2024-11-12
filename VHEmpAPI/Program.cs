@@ -9,6 +9,7 @@ using VHEmpAPI.Interfaces;
 using VHEmpAPI;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using VHEmpAPI.DbCommon;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +30,7 @@ var builder = WebApplication.CreateBuilder(args);
 //    throw; // Handle or rethrow the exception as appropriate
 //}
 
-builder.Services.AddSingleton<FirebaseService>();
+//builder.Services.AddSingleton<FirebaseService>();
 
 builder.Services.AddAuthentication(x =>
 {
@@ -90,6 +91,8 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.Services.AddScoped<IDBMethods, DBMethods>();
 
 builder.Services.AddScoped<IEmpLoginRepository, EmpLoginRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();

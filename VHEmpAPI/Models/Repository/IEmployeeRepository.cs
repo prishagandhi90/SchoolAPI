@@ -1,4 +1,5 @@
-﻿using VHEmpAPI.Shared;
+﻿using System.Data;
+using VHEmpAPI.Shared;
 using static VHEmpAPI.Shared.CommonProcOutputFields;
 
 namespace VHEmpAPI.Models.Repository
@@ -19,6 +20,9 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Resp_LvDelayReason>> GetLeaveDelayReason(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> EmpApp_GetLeaveRelieverNm(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LvEntryList>> EmpApp_GetLeaveEntryList(string EmpId, string LoginId, string Flag);
+        Task<IEnumerable<CommonProcOutputFields.Resp_HeaderEntryList>> EmpApp_GetHeaderList(string EmpId, string LoginId, string Flag);
         Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_SaveLeaveEntryList(string EmpId, SaveLeaveEntry saveLeaveEntry);
+        Task<IEnumerable<CommonProcOutputFields.Resp_value_name>> EmpApp_GetShiftWeekList(string EmpId, string LoginId);
+        Task<DataTable> GetEmpShiftReport(string EmpId, string LoginId, string DtRange);
     }
 }

@@ -5,6 +5,9 @@ using static VHEmpAPI.Shared.CommonProcOutputFields;
 using VHMobileAPI.Models;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
+using System.Data;
+using System.Globalization;
 
 namespace VHEmpAPI.Controllers
 {
@@ -641,6 +644,46 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("EmpApp_GetHeaderList")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetHeaderList(LoginId_EmpId_Flag loginId_EmpId_Flag)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId_Flag.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetHeaderList(EmpId, loginId_EmpId_Flag.LoginId, loginId_EmpId_Flag.Flag);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
         [HttpPost("EmpApp_SaveLeaveEntryList")]
         [Authorize]
         public async Task<ActionResult<dynamic>> EmpApp_SaveLeaveEntryList(SaveLeaveEntry saveLeaveEntry)
@@ -691,6 +734,153 @@ namespace VHEmpAPI.Controllers
             {
                 return Ok(new { statusCode = 400, IsSuccess = "false", Message = ex.Message, data = new { } });
                 //return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetShiftWeekList")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetShiftWeekList(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetShiftWeekList(EmpId, loginId_EmpId.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetEmpShiftReport")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetEmpShiftReport([FromBody] LoginId_EmpId_DtRange loginId_EmpId_DtRange)
+        {
+            //DataSet ds = new DataSet();
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId_DtRange.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                DataTable result = await employeeRepository.GetEmpShiftReport(EmpId, loginId_EmpId_DtRange.LoginId, loginId_EmpId_DtRange.DtRange);
+                if (result == null || result.Rows.Count == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                JArray JsonInnerObjList = new JArray();
+                JObject OutputJsonResult = new JObject();
+
+                // Loop through each row in DataTable
+                for (int i = 0; i < result.Rows.Count; i++)
+                {
+                    JObject innerJsonResult = new JObject
+                    {
+                        ["Code"] = result.Rows[i]["Code"].ToString(),
+                        ["Name"] = result.Rows[i]["Name"].ToString(),
+                    };
+
+                    JArray DateColumnsValue = new JArray();
+                    //JArray dateValues = new JArray();
+                    string dayName = "", formattedDate = "", todayDate = "false";
+                    foreach (DataColumn column in result.Columns)
+                    {
+                        // Skip "Code" and "Name" columns
+                        if (column.ColumnName != "Code" && column.ColumnName != "Name")
+                        {
+                            if (DateTime.TryParseExact(column.ColumnName, "dd-MMM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+                            {
+                                // Extract the day name
+                                dayName = date.ToString("dddd", CultureInfo.InvariantCulture);
+
+                                // Format the date to "dd MMM"
+                                formattedDate = date.ToString("dd\nMMM");
+
+                                if (date.Date <= DateTime.Today)
+                                    todayDate = "true";
+                                else
+                                    todayDate = "false";
+                            }
+                            // Add date column name and its value
+                            DateColumnsValue.Add(new JObject
+                            {
+                                ["Name"] = formattedDate,
+                                ["Value"] = dayName + "\n" + result.Rows[i][column].ToString(),
+                                ["ActiveYN"] = todayDate,
+                            });
+                        }
+
+                        //if (column.ColumnName != "Code" && column.ColumnName != "Name")
+                        //{
+                        //    // Add date column name and its value
+                        //    dateValues.Add(new JObject
+                        //    {
+                        //        ["Value"] = result.Rows[i][column].ToString()
+                        //    });
+                        //}
+                    }
+
+                    // Add dateValues array to innerJsonResult under "DateData"
+                    innerJsonResult["DateColumnsValue"] = DateColumnsValue;
+                    //innerJsonResult["DateValues"] = dateValues;
+                    JsonInnerObjList.Add(innerJsonResult);
+                }
+
+                var FinalOutput = new JObject
+                {
+                    ["statusCode"] = Ok(result).StatusCode,
+                    ["IsSuccess"] = "true",
+                    ["Message"] = "Data fetched successfully",
+                    ["data"] = JsonInnerObjList
+                };
+
+                return Ok(FinalOutput.ToString(Newtonsoft.Json.Formatting.None));
+
+                //return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = jsonDt });
+                //return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = jsonResult.ToString(Formatting.None) });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
             }
             finally
             {

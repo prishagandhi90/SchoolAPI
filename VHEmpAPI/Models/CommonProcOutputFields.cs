@@ -307,6 +307,16 @@ namespace VHEmpAPI.Shared
 
         }
 
+         [Keyless]
+        public class Resp_HeaderEntryList
+        {
+            public string? Department { get; set; }
+            public string? SubDept { get; set; }
+            public string? DeptInc { get; set; }
+            public string? DeptHOD { get; set; }
+            public string? SubDeptInc { get; set; }
+        }
+
         [Keyless]
         public class LoginId_EmpId_Flag
         {
@@ -340,6 +350,13 @@ namespace VHEmpAPI.Shared
         {
             public string? SavedYN { get; set; }
         }
-    }
 
+        [Keyless]
+        public class LoginId_EmpId_DtRange
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? DtRange { get; set; }
+        }
+    }
 }
