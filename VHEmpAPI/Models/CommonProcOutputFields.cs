@@ -358,5 +358,56 @@ namespace VHEmpAPI.Shared
             public string? EmpId { get; set; }
             public string? DtRange { get; set; }
         }
+
+        [Keyless]
+        public class LoginId_EmpId_PresMed
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? MstId { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_Dr_PrecriptionViewer
+        {
+            public Int32? SRNo { get; set; }
+            public string? Priority { get; set; }
+            public string? RxType { get; set; }
+            public string? PatientName { get; set; }
+            public string? RxStatus { get; set; }
+            public string? UHID { get; set; }
+            public string? IPD { get; set; }
+            public string? Ward { get; set; }
+            public string? Bed { get; set; }
+            public string? LastUser { get; set; }
+            public string? Timeofsavingbill { get; set; }
+            public Int32? MstId { get; set; }
+            public Int32? AdmissionId { get; set; }
+            public string? IndoorRecordType { get; set; }
+            public string? IsPharmaUsr { get; set; }
+            public Int32? stsrt { get; set; }
+            public string? PrintStatus { get; set; }
+            public string? PrintUserName { get; set; }
+            public string? PrintDateTime { get; set; }
+            public string? RxCtgr { get; set; }
+            public string? Doctor { get; set; }
+            public string? MOP { get; set; }
+            public string? dte { get; set; }
+            public string? Intercom { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_Dr_PrecriptionMedicines
+        {
+            public Int64? Sr { get; set; }
+            public string? Form_Brand { get; set; }
+            public string? GenericName { get; set; }
+            public string? rmk { get; set; }
+            public string? instruction_typ { get; set; }
+            public string? Freq { get; set; }
+            public Int32? qty { get; set; }
+            public string? medicine_type { get; set; }
+            public string? pkg { get; set; }
+        }
     }
 }

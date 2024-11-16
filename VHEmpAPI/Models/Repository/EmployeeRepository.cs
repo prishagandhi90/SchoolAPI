@@ -324,6 +324,7 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<Resp_value_name>)Enumerable.Empty<string>();
         }
+        
         public async Task<DataTable> GetEmpShiftReport(string EmpId, string LoginId, string DtRange)
         {
             try
@@ -354,6 +355,37 @@ namespace VHEmpAPI.Models.Repository
             return new DataTable();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetDrPrescriptionViewer @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var Dr_PrecViewerData = await AppDbContextAdm.Resp_Dr_PrecriptionViewer.FromSqlRaw(sqlStr).ToListAsync();
+                return Dr_PrecViewerData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_Dr_PrecriptionViewer>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionMedicines>> GetDrPrescriptionMedicines(string EmpId, string LoginId, string MstId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetDrPrescriptionMedicines @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "', @p_mst_id = '" + MstId + "' ";
+                var Dr_PrecViewerMed = await AppDbContextAdm.Resp_Dr_PrecriptionMedicines.FromSqlRaw(sqlStr).ToListAsync();
+                return Dr_PrecViewerMed;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_Dr_PrecriptionMedicines>)Enumerable.Empty<string>();
+        }
     }
 
 }

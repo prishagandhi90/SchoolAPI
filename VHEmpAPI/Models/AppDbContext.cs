@@ -69,6 +69,12 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<SavedYesNo>? SavedYesNo { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_Dr_PrecriptionViewer>? Resp_Dr_PrecriptionViewer { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_Dr_PrecriptionMedicines>? Resp_Dr_PrecriptionMedicines { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
