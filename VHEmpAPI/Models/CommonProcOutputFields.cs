@@ -446,9 +446,9 @@ namespace VHEmpAPI.Shared
         {
             public string? LoginId { get; set; }
             public string? PrefixText { get; set; } = "";
-            public List<Wards>? Wards { get; set; }
-            public List<Floors>? Floors { get; set; }
-            public List<Beds>? Beds { get; set; }
+            public List<string>? Wards { get; set; }
+            public List<string>? Floors { get; set; }
+            public List<string>? Beds { get; set; }
         }
     }
 }
