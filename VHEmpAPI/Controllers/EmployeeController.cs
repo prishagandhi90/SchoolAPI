@@ -816,6 +816,7 @@ namespace VHEmpAPI.Controllers
                     {
                         ["Code"] = result.Rows[i]["Code"].ToString(),
                         ["Name"] = result.Rows[i]["Name"].ToString(),
+                        ["SubDepartment"] = result.Rows[i]["SubDepartment"].ToString(),
                     };
 
                     JArray DateColumnsValue = new JArray();
@@ -824,7 +825,7 @@ namespace VHEmpAPI.Controllers
                     foreach (DataColumn column in result.Columns)
                     {
                         // Skip "Code" and "Name" columns
-                        if (column.ColumnName != "Code" && column.ColumnName != "Name")
+                        if (column.ColumnName != "Code" && column.ColumnName != "Name" && column.ColumnName != "SubDepartment")
                         {
                             if (DateTime.TryParseExact(column.ColumnName, "dd-MMM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
                             {
@@ -889,7 +890,7 @@ namespace VHEmpAPI.Controllers
 
         [HttpPost("GetDrPrescriptionViewer")]
         [Authorize]
-        public async Task<ActionResult<Resp_Dr_PrecriptionViewer>> GetDrPrescriptionViewer(LoginId_EmpId loginId_EmpId)
+        public async Task<ActionResult<Resp_Dr_PrecriptionViewer>> GetDrPrescriptionViewer(FilteredPharmaPrecriptionData filteredPharmaPrecriptionData)
         {
             try
             {
@@ -897,7 +898,7 @@ namespace VHEmpAPI.Controllers
                 var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string Token = WebUtility.UrlDecode(tokenNum);
 
-                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, filteredPharmaPrecriptionData.LoginId);
                 if (isValidToken != null)
                 {
                     IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
@@ -908,7 +909,14 @@ namespace VHEmpAPI.Controllers
                     }
                 }
 
-                var result = await employeeRepository.EmpApp_GetDrPrescriptionViewer(EmpId, loginId_EmpId.LoginId);
+                //var result = await employeeRepository.EmpApp_GetDrPrescriptionViewer(EmpId, filteredPharmaPrecriptionData.LoginId);
+
+                List<Resp_Dr_PrecriptionViewer> result = new List<Resp_Dr_PrecriptionViewer>();
+                if (filteredPharmaPrecriptionData != null)
+                    result = (List<Resp_Dr_PrecriptionViewer>)await employeeRepository.EmpApp_GetDrPrescriptionViewer(EmpId, filteredPharmaPrecriptionData.LoginId, filteredPharmaPrecriptionData.PrefixText, filteredPharmaPrecriptionData.Wards, filteredPharmaPrecriptionData.Floors, filteredPharmaPrecriptionData.Beds);
+                else
+                    result = (List<Resp_Dr_PrecriptionViewer>)await employeeRepository.EmpApp_GetDrPrescriptionViewer(EmpId, filteredPharmaPrecriptionData.LoginId, filteredPharmaPrecriptionData.PrefixText, new List<string>(), new List<string>(), new List<string>());
+
                 if (result == null)
                     return NotFound();
 
@@ -966,5 +974,121 @@ namespace VHEmpAPI.Controllers
             {
             }
         }
+
+        [HttpPost("GetPharmaDashboardFilters")]
+        [Authorize]
+        public async Task<ActionResult<GetPharmaDashboardFilters>> GetDashboardFilters(LoginIdNum loginIdNum)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginIdNum.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var Wards = await employeeRepository.GetWards(EmpId, loginIdNum.LoginId);
+                var Floors = await employeeRepository.GetFloors(EmpId, loginIdNum.LoginId);
+                var Beds = await employeeRepository.GetBeds(EmpId, loginIdNum.LoginId);
+
+                var result = new GetPharmaDashboardFilters
+                {
+                    Wards = (List<Wards>)Wards,
+                    Floors = (List<Floors>)Floors,
+                    Beds = (List<Beds>)Beds,
+                };
+
+                if (result == null)
+                    return NotFound();
+
+                return Ok(new { statusCode = Ok(result).StatusCode, isSuccess = "true", message = "Success!", data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetFloors")]
+        [Authorize]
+        public async Task<ActionResult<Floors>> GetFloors(LoginIdNum loginIdNum)
+        {
+            try
+            {
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+                var result = await employeeRepository.GetFloors(tokenNum, loginIdNum.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetWards")]
+        [Authorize]
+        public async Task<ActionResult<Wards>> GetWards(LoginIdNum loginIdNum)
+        {
+            try
+            {
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+                var result = await employeeRepository.GetWards(tokenNum, loginIdNum.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetBeds")]
+        [Authorize]
+        public async Task<ActionResult<Beds>> GetBeds(LoginIdNum loginIdNum)
+        {
+            try
+            {
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+                var result = await employeeRepository.GetWards(tokenNum, loginIdNum.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
     }
 }

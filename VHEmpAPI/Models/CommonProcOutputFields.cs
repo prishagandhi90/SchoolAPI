@@ -409,5 +409,46 @@ namespace VHEmpAPI.Shared
             public string? medicine_type { get; set; }
             public string? pkg { get; set; }
         }
+
+        [Keyless]
+        public class Wards
+        {
+            public string? IsValidToken { get; set; }
+            public int? WardId { get; set; }
+            public string? WardName { get; set; }
+        }
+
+        [Keyless]
+        public class Floors
+        {
+            public string? IsValidToken { get; set; }
+            public int? FloorId { get; set; }
+            public string? FloorName { get; set; }
+        }
+
+        [Keyless]
+        public class Beds
+        {
+            public int? BedId { get; set; }
+            public string? BedName { get; set; }
+        }
+
+        [Keyless]
+        public class GetPharmaDashboardFilters
+        {
+            public List<Wards>? Wards { get; set; }
+            public List<Floors>? Floors { get; set; }
+            public List<Beds>? Beds { get; set; }
+        }
+
+        [Keyless]
+        public class FilteredPharmaPrecriptionData
+        {
+            public string? LoginId { get; set; }
+            public string? PrefixText { get; set; } = "";
+            public List<Wards>? Wards { get; set; }
+            public List<Floors>? Floors { get; set; }
+            public List<Beds>? Beds { get; set; }
+        }
     }
 }

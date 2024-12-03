@@ -355,12 +355,16 @@ namespace VHEmpAPI.Models.Repository
             return new DataTable();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId)
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds)
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetDrPrescriptionViewer @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
+                string Wards_commaSep = string.Join(",", Wards);
+                string Floors_commaSep = string.Join(",", Floors);
+                string Beds_commaSep = string.Join(",", Beds);
+                string sqlStr = "exec dbo.EmpApp_GetDrPrescriptionViewer @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
+                                "@p_PrefixText = '" + PrefixText + "', @p_Wards = '" + Wards_commaSep + "', " +
+                                "@p_Floors = '" + Floors_commaSep + "', @p_Beds = '" + Beds_commaSep + "' ";
                 var Dr_PrecViewerData = await AppDbContextAdm.Resp_Dr_PrecriptionViewer.FromSqlRaw(sqlStr).ToListAsync();
                 return Dr_PrecViewerData;
             }
@@ -385,6 +389,54 @@ namespace VHEmpAPI.Models.Repository
 
             }
             return (IEnumerable<Resp_Dr_PrecriptionMedicines>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Wards>> GetWards(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_GetWards @p_DrId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Wards.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Wards>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Floors>> GetFloors(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_GetFloors @p_DrId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Floors.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Floors>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_GetBeds @p_DrId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Beds.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Beds>)Enumerable.Empty<string>();
         }
     }
 

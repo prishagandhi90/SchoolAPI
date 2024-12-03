@@ -75,7 +75,16 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_Dr_PrecriptionMedicines>? Resp_Dr_PrecriptionMedicines { get; set; }
-        
+
+        [NotMapped]
+        public DbSet<Wards> Wards { get; set; }
+
+        [NotMapped]
+        public DbSet<Floors> Floors { get; set; }
+
+        [NotMapped]
+        public DbSet<Beds> Beds { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

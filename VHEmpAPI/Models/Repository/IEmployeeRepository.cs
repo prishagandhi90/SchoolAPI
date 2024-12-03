@@ -24,7 +24,11 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_SaveLeaveEntryList(string EmpId, SaveLeaveEntry saveLeaveEntry);
         Task<IEnumerable<CommonProcOutputFields.Resp_value_name>> EmpApp_GetShiftWeekList(string EmpId, string LoginId);
         Task<DataTable> GetEmpShiftReport(string EmpId, string LoginId, string DtRange);
-        Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId);
+        Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds);
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionMedicines>> GetDrPrescriptionMedicines(string EmpId, string LoginId, string MstId);
+        Task<IEnumerable<CommonProcOutputFields.Floors>> GetFloors(string EmpId, string LoginId);
+        Task<IEnumerable<CommonProcOutputFields.Wards>> GetWards(string EmpId, string LoginId);
+        Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId);
+
     }
 }
