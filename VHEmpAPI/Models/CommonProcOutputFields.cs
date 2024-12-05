@@ -368,6 +368,13 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class SortDr_PrecriptionViewer
+        {
+            public string? LoginId { get; set; }
+            public string? SortType { get; set; } = "";
+        }
+
+        [Keyless]
         public class Resp_Dr_PrecriptionViewer
         {
             public Int32? SRNo { get; set; }

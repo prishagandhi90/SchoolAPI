@@ -935,6 +935,51 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("SortDr_PrecriptionViewer")]
+        [Authorize]
+        public async Task<ActionResult<Resp_Dr_PrecriptionViewer>> SortDr_PrecriptionViewer([FromBody] SortDr_PrecriptionViewer sortPatientData = null)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, sortPatientData.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                List<Resp_Dr_PrecriptionViewer> result = new List<Resp_Dr_PrecriptionViewer>();
+                if (sortPatientData != null)
+                    result = (List<Resp_Dr_PrecriptionViewer>)await employeeRepository.SortDr_PrecriptionViewer(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
+                else
+                    result = (List<Resp_Dr_PrecriptionViewer>)await employeeRepository.SortDr_PrecriptionViewer(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
+
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or Something went wrong!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
         [HttpPost("GetDrPrescriptionMedicines")]
         [Authorize]
         public async Task<ActionResult<Resp_Dr_PrecriptionMedicines>> GetDrPrescriptionMedicines(LoginId_EmpId_PresMed loginId_PrecMed)

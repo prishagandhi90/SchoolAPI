@@ -375,6 +375,22 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_Dr_PrecriptionViewer>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> SortDr_PrecriptionViewer(string EmpId, string LoginId, string SortType)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_SortDrPrescriptionViewer @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
+                                "@p_SortType = '" + SortType + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_Dr_PrecriptionViewer.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_Dr_PrecriptionViewer>)Enumerable.Empty<string>();
+        }
+
         public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionMedicines>> GetDrPrescriptionMedicines(string EmpId, string LoginId, string MstId)
         {
             try
