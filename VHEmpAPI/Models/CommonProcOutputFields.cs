@@ -450,5 +450,15 @@ namespace VHEmpAPI.Shared
             public List<string>? Floors { get; set; }
             public List<string>? Beds { get; set; }
         }
+
+        [Keyless]
+        public class DoctorNotification
+        {
+            public Int64? Id { get; set; }
+            public string? MessageTitle { get; set; }
+            public string? Message { get; set; }
+            public string? Status { get; set; }
+            public DateTime? SentDate { get; set; }
+        }
     }
 }

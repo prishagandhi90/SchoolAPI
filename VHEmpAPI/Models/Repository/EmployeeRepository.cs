@@ -438,6 +438,21 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<Beds>)Enumerable.Empty<string>();
         }
+
+        public async Task<IEnumerable<DoctorNotification>> GetDrNotifications(string loginId, string EmpId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.GetDrNotifications @p_LoginId = '" + loginId + "', @p_DrId = '" + EmpId + "' ";
+                var DrNotification = await AppDbContextAdm.DrNotification.FromSqlRaw(sqlStr).ToListAsync();
+                return DrNotification;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<DoctorNotification>)Enumerable.Empty<string>();
+        }
     }
 
 }

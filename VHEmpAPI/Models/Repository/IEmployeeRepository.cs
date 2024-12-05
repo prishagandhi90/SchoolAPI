@@ -30,5 +30,7 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Wards>> GetWards(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId);
 
+        Task<IEnumerable<DoctorNotification>> GetDrNotifications(string loginId, string EmpId);
+
     }
 }

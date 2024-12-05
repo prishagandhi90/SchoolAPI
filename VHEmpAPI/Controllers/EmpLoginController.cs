@@ -101,6 +101,11 @@ namespace VHEmpAPI.Controllers
                     return Ok(new { StatusCode = 400, Message = "Bad Request", Data = new { } });
                 }
 
+                if (result.FirstOrDefault().OTPNo == "")
+                {
+                    return Ok(new { StatusCode = 400, IsSuccess = "false", Message = result != null ? result.FirstOrDefault().Message.ToString() : "", Data = new { } });
+                }
+
                 var response = Ok(result);
                 if (response.StatusCode == 200)
                 {
