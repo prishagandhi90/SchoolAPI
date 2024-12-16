@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web;
 using VHEmpAPI.Interfaces;
 using VHEmpAPI.Models.Repository;
+using VHMobileAPI.Models;
 using static VHEmpAPI.Shared.CommonProcOutputFields;
 
 namespace VHEmpAPI.Controllers
@@ -143,6 +144,46 @@ namespace VHEmpAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+
+            }
+        }
+
+        [HttpPost("GenerateNewPassword")]
+        public async Task<ActionResult<dynamic>> GenerateNewPassword([FromBody] MobileCreds mobileCreds)
+        {
+            try
+            {
+                string Mobile = WebUtility.UrlDecode(mobileCreds.MobileNo);
+                string Pass = WebUtility.UrlDecode(mobileCreds.Password);
+                OTP respOTP = new OTP();
+
+
+                string encodedPassword = "", decodedPassword = "";
+                encodedPassword = EncodeDecode.EncodePasswordToBase64(Pass);
+
+                //decodedPassword = EncodeDecode.DecodeFrom64(encodedPassword);
+
+                mobileCreds.Password = encodedPassword;
+
+                var result = await empLoginRepository.GenerateNewPassword(mobileCreds.MobileNo, mobileCreds.Password);
+                if (result == null)
+                    return NotFound();
+
+                if (result.FirstOrDefault().IsValid != "true")
+                {
+                    return Ok(new { StatusCode = 400, IsSuccess = "false", Message = result.FirstOrDefault().Message, Data = new { } });
+                }
+
+                return Ok(new { StatusCode = Response.StatusCode, IsSuccess = "true", Message = result.FirstOrDefault().Message, Data = result.FirstOrDefault() });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+
             }
             finally
             {

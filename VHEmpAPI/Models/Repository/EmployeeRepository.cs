@@ -21,6 +21,21 @@ namespace VHEmpAPI.Models.Repository
             _dbMethods = dbm ?? throw new ArgumentNullException(nameof(dbm));
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.TokenData>> ValidateMobile_Pass(MobileCreds mobileCreds)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_Validate_Emp_Mobile_Pass @p_Mobile = '" + mobileCreds.MobileNo + "', @p_Password = '" + mobileCreds.Password + "' ";
+                var IsValidData = await AppDbContextAdm.TokenData.FromSqlRaw(sqlStr).ToListAsync();
+                return IsValidData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<TokenData>)Enumerable.Empty<string>();
+        }
+
         public async Task<IEnumerable<CommonProcOutputFields.IsValidToken>> IsTokenValid(string TokenNo, string LoginId)
         {
             try

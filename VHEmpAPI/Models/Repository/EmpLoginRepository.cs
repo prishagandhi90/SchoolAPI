@@ -20,7 +20,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.Validate_Dr_Mobile @p_Mobile = '" + MobileNo + "' ";
+                string sqlStr = "exec dbo.EmpApp_Validate_Emp_Mobile @p_Mobile = '" + MobileNo + "' ";
                 var IsValidNo = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
                 return IsValidNo;
             }
@@ -197,6 +197,22 @@ namespace VHEmpAPI.Models.Repository
                 return (IEnumerable<OTP>)Enumerable.Empty<string>();
             }
             return (IEnumerable<OTP>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.IsValidData>> GenerateNewPassword(string MobileNo, string Password)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_SaveMobilePassword @p_Mobile = '" + MobileNo + "', " +
+                                "@p_Password = '" + Password + "' ";
+                var IsValidNo = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+                return IsValidNo;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
         }
     }
 }

@@ -6,6 +6,7 @@ namespace VHEmpAPI.Models.Repository
 {
     public interface IEmployeeRepository
     {
+        Task<IEnumerable<TokenData>> ValidateMobile_Pass(MobileCreds mobileCreds);
         Task<IEnumerable<CommonProcOutputFields.IsValidToken>> IsTokenValid(string TokenNo, string LoginId);
         Task<IEnumerable<LoginId_TokenData>> Save_Token_UserCreds_and_ReturnToken(MobileCreds model, string TokenNo);
         Task<IEnumerable<CommonProcOutputFields.DashBoardList>> DisplayDashboardList(string TokenNo, string LoginId);

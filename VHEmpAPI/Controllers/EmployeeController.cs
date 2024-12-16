@@ -60,49 +60,46 @@ namespace VHEmpAPI.Controllers
 
             #region password logic commented
 
-            //else if (mobileCreds.MobileNo != "" && mobileCreds.OTP == "" && mobileCreds.Password != "")
-            //{
-            //    TokenData tokenData = new TokenData();
+            else if (mobileCreds.MobileNo != "" && mobileCreds.OTP == "" && mobileCreds.Password != "")
+            {
+                TokenData tokenData = new TokenData();
 
-            //    string encodedPassword = "";
-            //    //mobileCreds.Password = EncodeDecode.DecodeFrom64(mobileCreds.Password);
-            //    mobileCreds.Password = EncodeDecode.EncodePasswordToBase64(mobileCreds.Password);
+                string encodedPassword = "";
+                //mobileCreds.Password = EncodeDecode.DecodeFrom64(mobileCreds.Password);
+                mobileCreds.Password = EncodeDecode.EncodePasswordToBase64(mobileCreds.Password);
 
-            //    var IsValidMobile = await employeeRepository.ValidateMobile_Pass(mobileCreds);
+                var IsValidMobile = await employeeRepository.ValidateMobile_Pass(mobileCreds);
 
-            //    string IsValid = "", TokenYN = "N";
-            //    if (IsValidMobile != null && IsValidMobile.Count() > 0)
-            //    {
-            //        IsValid = IsValidMobile.Select(x => x.IsValidCreds).ToList()[0].ToString();
-            //        TokenYN = IsValidMobile.Select(x => x.TokenNo).ToList()[0].ToString();
+                string IsValid = "", TokenYN = "N";
+                if (IsValidMobile != null && IsValidMobile.Count() > 0)
+                {
+                    IsValid = IsValidMobile.Select(x => x.IsValidCreds).ToList()[0].ToString();
+                    TokenYN = IsValidMobile.Select(x => x.TokenNo).ToList()[0].ToString();
 
-            //        if (IsValid.ToUpper() != "TRUE")
-            //        {
-            //            tokenData.IsValidCreds = IsValid;
-            //            return Ok(new { statusCode = Ok(IsValidMobile).StatusCode, isSuccess = "false", message = "Invalid MobileNo or Password", data = new { } });
-            //        }
+                    if (IsValid.ToUpper() != "TRUE")
+                    {
+                        tokenData.IsValidCreds = IsValid;
+                        return Ok(new { statusCode = Ok(IsValidMobile).StatusCode, isSuccess = "false", message = "Invalid MobileNo or Password", data = new { } });
+                    }
 
-            //        else if (IsValid.ToUpper() == "TRUE")
-            //        {
-            //            SaveTokens_UserCreds saveTokens_UserCreds = new SaveTokens_UserCreds();
-            //            saveTokens_UserCreds.MobileNo = mobileCreds.MobileNo;
+                    else if (IsValid.ToUpper() == "TRUE")
+                    {
+                        DashBoardList dashboardList = new DashBoardList();
+                        dashboardList = await Save_Get_Token(mobileCreds);
+                        if (dashboardList != null)
+                        {
+                            if (dashboardList.is_valid_token != "Y")
+                            {
+                                return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                            }
 
-            //            DashBoardList dashboardList = new DashBoardList();
-            //            dashboardList = await Save_Get_Token(mobileCreds);
-            //            if (dashboardList != null)
-            //            {
-            //                if (dashboardList.is_valid_token != "Y")
-            //                {
-            //                    return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
-            //                }
+                            return Ok(new { statusCode = Ok(dashboardList).StatusCode, isSuccess = "true", message = "Login Successful", data = dashboardList });
+                        }
 
-            //                return Ok(new { statusCode = Ok(dashboardList).StatusCode, isSuccess = "true", message = "Login Successful", data = dashboardList });
-            //            }
-
-            //            return Ok(new { statusCode = Ok(dashboardList).StatusCode, isSuccess = "false", message = "Bad Request", data = new { } });
-            //        }
-            //    }
-            //}
+                        return Ok(new { statusCode = Ok(dashboardList).StatusCode, isSuccess = "false", message = "Bad Request", data = new { } });
+                    }
+                }
+            }
 
             #endregion
 
