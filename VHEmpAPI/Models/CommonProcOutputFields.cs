@@ -378,6 +378,7 @@ namespace VHEmpAPI.Shared
         public class Resp_Dr_PrecriptionViewer
         {
             public Int32? SRNo { get; set; }
+            public Int32? TokenNo { get; set; }
             public string? Priority { get; set; }
             public string? RxType { get; set; }
             public string? PatientName { get; set; }
