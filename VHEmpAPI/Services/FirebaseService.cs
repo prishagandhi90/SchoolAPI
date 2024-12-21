@@ -26,7 +26,7 @@ public class FirebaseService
     {
         // Initialize Firebase Admin SDK
         //var firebaseCredentialPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FirebaseCredentials", "vhempapp-firebase-adminsdk-30xyo-820e48ac12.json");
-        var firebaseCredentialPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FirebaseCredentials", "vhempapp-3591e-firebase-adminsdk-v5daj-cb50988661.json");
+        var firebaseCredentialPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FirebaseCredentials", "vhempapp-3591e-0bbb8836f0a3.json");
         //var credentialsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FirebaseCredentials", "firebase-adminsdk.json");
         var firebaseApp = FirebaseApp.Create(new AppOptions
         {
