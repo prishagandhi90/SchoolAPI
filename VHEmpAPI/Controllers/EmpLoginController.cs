@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Http;
@@ -188,6 +189,31 @@ namespace VHEmpAPI.Controllers
             finally
             {
 
+            }
+        }
+
+        [HttpPost("GetLoginUserNames")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetLoginUserNames(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                var result = await empLoginRepository.GetLoginUserNames(loginId_EmpId.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
             }
         }
 

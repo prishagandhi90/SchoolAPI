@@ -214,5 +214,20 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
         }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> GetLoginUserNames(string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLoginUserNames @p_LoginId = '" + LoginId + "' ";
+                var UsersData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+                return UsersData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_id_name>)Enumerable.Empty<string>();
+        }
     }
 }
