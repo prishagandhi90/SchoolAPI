@@ -229,5 +229,21 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<Resp_id_name>)Enumerable.Empty<string>();
         }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LoginAs_Creds>> GetLoginAsUserCreds(string AdminMobileNo, string UserNm)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLoginAsUserCreds @p_AdminMobileNo = '" + AdminMobileNo + "', " +
+                                "@p_UserNm = '" + UserNm + "' ";
+                var CredsData = await AppDbContextAdm.Resp_LoginAs_Creds.FromSqlRaw(sqlStr).ToListAsync();
+                return CredsData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_LoginAs_Creds>)Enumerable.Empty<string>();
+        }
     }
 }

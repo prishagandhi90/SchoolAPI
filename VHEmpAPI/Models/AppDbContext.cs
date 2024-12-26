@@ -88,6 +88,9 @@ namespace VHEmpAPI.Models
         [NotMapped]
         public DbSet<DoctorNotification> DrNotification { get; set; }
 
+        [NotMapped]
+        public DbSet<Resp_LoginAs_Creds> Resp_LoginAs_Creds { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -468,5 +468,20 @@ namespace VHEmpAPI.Shared
             public string? Status { get; set; }
             public DateTime? SentDate { get; set; }
         }
+
+        [Keyless]
+        public class LoginAs_AdmMob_UsrNm
+        {
+            public string? AdminMobileNo { get; set; }
+            public string? UserName { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_LoginAs_Creds
+        {
+            public string? LoginId { get; set; }
+            public string? TokenNo { get; set; }
+            public string? EmpId { get; set; }
+        }
     }
 }

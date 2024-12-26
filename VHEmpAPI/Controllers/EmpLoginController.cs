@@ -217,5 +217,29 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("GetLoginAsUserCreds")]
+        //[Authorize]
+        public async Task<ActionResult<dynamic>> GetLoginAsUserCreds(LoginAs_AdmMob_UsrNm loginAs_AdmMob_UsrNm)
+        {
+            try
+            {
+                var result = await empLoginRepository.GetLoginAsUserCreds(loginAs_AdmMob_UsrNm.AdminMobileNo, loginAs_AdmMob_UsrNm.UserName);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
     }
 }
