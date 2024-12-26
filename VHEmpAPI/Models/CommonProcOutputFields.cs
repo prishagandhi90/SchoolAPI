@@ -93,6 +93,7 @@ namespace VHEmpAPI.Shared
             public string? Department { get; set; }
             public string? Designation { get; set; }
             public string? Emp_Type { get; set; }
+            public string? IsSuperAdmin { get; set; }
         }
 
         [Keyless]
