@@ -484,6 +484,22 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<DoctorNotification>)Enumerable.Empty<string>();
         }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesList>> EmpApp_Get_LV_OT_RolesList(string EmpId, string LoginId, string RoleNm, string Flag)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_Get_LV_OT_Roles @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
+                                "@p_Role = '"+ RoleNm +"', @p_Flag = '" + Flag + "' ";
+                var Lv_Ot_Roles_Lst = await AppDbContextAdm.Resp_LV_OT_RolesList.FromSqlRaw(sqlStr).ToListAsync();
+                return Lv_Ot_Roles_Lst;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_LV_OT_RolesList>)Enumerable.Empty<string>();
+        }
     }
 
 }

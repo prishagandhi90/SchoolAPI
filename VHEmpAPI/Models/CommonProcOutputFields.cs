@@ -327,6 +327,15 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class LoginId_EmpId_Lv_OT_Flag
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? Role { get; set; }
+            public string? Flag { get; set; }
+        }
+
+        [Keyless]
         public class SaveLeaveEntry
         {
             public string? LoginId { get; set; }
@@ -484,5 +493,36 @@ namespace VHEmpAPI.Shared
             public string? TokenNo { get; set; }
             public string? EmpId { get; set; }
         }
+
+        [Keyless]
+        public class Resp_LV_OT_RolesList
+        {
+            public int? LeaveId { get; set; }
+            public string? TypeValue { get; set; }
+            public string? TypeName { get; set; }
+            public string? LeaveShortName { get; set; }
+            public string? LeaveFullName { get; set; }
+            public string? EmployeeCodeValue { get; set; }
+            public string? EmployeeCodeName { get; set; }
+            public string? FromDate { get; set; }
+            public string? ToDate { get; set; }
+            public decimal? OverTimeMinutes { get; set; }
+            public string? LeaveDays { get; set; }
+            public string? Reason { get; set; }
+            public string? InchargeAction { get; set; }
+            public string? HodAction { get; set; }
+            public string? DeptInc { get; set; }
+            public string? DeptHOD { get; set; }
+            public string? HoDNote { get; set; }
+            public string? HRNote { get; set; }
+            public string? EnterDate { get; set; }
+            public string? RelieverEmpName { get; set; }
+            public string? LateReasonName { get; set; }
+            public string? OTHours { get; set; }
+            public string? EmpTel { get; set; }
+            public string? PunchTime { get; set; }
+            public string? ShiftTime { get; set; }
+        }
+
     }
 }

@@ -826,6 +826,15 @@ namespace VHEmpAPI.Controllers
                         {
                             if (DateTime.TryParseExact(column.ColumnName, "dd-MMM-yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
                             {
+                                //if (
+                                //     (column.ColumnName.ToLower().Contains("dec") || column.ColumnName.ToLower().Contains("nov"))
+                                //     && DateTime.Today.Month == 1
+                                //   )
+                                //{
+                                //    // Adjust year to the previous year if December and current month is January
+                                //    date = new DateTime(DateTime.Today.Year - 1, date.Month, date.Day);
+                                //}
+
                                 // Extract the day name
                                 dayName = date.ToString("dddd", CultureInfo.InvariantCulture);
 
@@ -1173,5 +1182,45 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+
+        [HttpPost("EmpApp_Get_LV_OT_Roles")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_Get_LV_OT_Roles(LoginId_EmpId_Lv_OT_Flag loginId_EmpId_Lv_OT_Flag)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId_Lv_OT_Flag.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_Get_LV_OT_RolesList(EmpId, loginId_EmpId_Lv_OT_Flag.LoginId, loginId_EmpId_Lv_OT_Flag.Role, loginId_EmpId_Lv_OT_Flag.Flag);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
     }
 }

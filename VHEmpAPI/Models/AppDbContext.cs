@@ -90,7 +90,10 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_LoginAs_Creds> Resp_LoginAs_Creds { get; set; }
-        
+
+        [NotMapped]
+        public DbSet<Resp_LV_OT_RolesList>? Resp_LV_OT_RolesList { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -31,8 +31,8 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Floors>> GetFloors(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Wards>> GetWards(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId);
-
         Task<IEnumerable<DoctorNotification>> GetDrNotifications(string loginId, string EmpId);
+        Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesList>> EmpApp_Get_LV_OT_RolesList(string EmpId, string LoginId, string RoleNm, string Flag);
 
     }
 }
