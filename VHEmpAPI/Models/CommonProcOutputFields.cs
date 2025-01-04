@@ -94,6 +94,7 @@ namespace VHEmpAPI.Shared
             public string? Designation { get; set; }
             public string? Emp_Type { get; set; }
             public string? IsSuperAdmin { get; set; }
+            public string? IsPharmacyUser { get; set; }
         }
 
         [Keyless]
