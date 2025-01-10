@@ -413,6 +413,7 @@ namespace VHEmpAPI.Shared
             public string? MOP { get; set; }
             public string? dte { get; set; }
             public string? Intercom { get; set; }
+            public string? Org { get; set; }
         }
 
         [Keyless]
@@ -523,6 +524,7 @@ namespace VHEmpAPI.Shared
             public string? EmpTel { get; set; }
             public string? PunchTime { get; set; }
             public string? ShiftTime { get; set; }
+            public string? DefaultRole { get; set; }
         }
 
     }
