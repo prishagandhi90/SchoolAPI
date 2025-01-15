@@ -527,5 +527,18 @@ namespace VHEmpAPI.Shared
             public string? DefaultRole { get; set; }
         }
 
+        [Keyless]
+        public class Upd_Lv_OT_entry
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? Flag { get; set; }
+            public string? LeaveDetailId { get; set; }
+            public string? Action { get; set; }
+            public string? Reason { get; set; }
+            public string? UserName { get; set; }
+            public string? Note { get; set; }
+
+        }
     }
 }

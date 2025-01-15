@@ -500,6 +500,34 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<Resp_LV_OT_RolesList>)Enumerable.Empty<string>();
         }
+
+        public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_upd_leave_detail @p_LoginId = '" + upd_Lv_OT_entry.LoginId + "', @p_EmpId = '" + EmpId + "', " +
+                                "@p_Flag = '" + upd_Lv_OT_entry.Flag + "', @p_leavedetailid = '" + upd_Lv_OT_entry.LeaveDetailId + "', " +
+                                "@p_action = '" + upd_Lv_OT_entry.Action + "', @p_reason = '" + upd_Lv_OT_entry.Reason + "', " +
+                                "@p_usr_nm = '" + upd_Lv_OT_entry.UserName + "', @p_note = '" + upd_Lv_OT_entry.Note + "' ";
+                var savedYN = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
+                return new List<CommonProcOutputFields.SavedYesNo>
+                {
+                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" }
+                };
+                //return DashboardData;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message); // You can log this or save it in DB
+
+                return new List<CommonProcOutputFields.SavedYesNo>
+                {
+                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Error: " + ex.Message }
+                };
+            }
+            return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
+        }
+
     }
 
 }
