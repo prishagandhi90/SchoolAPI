@@ -525,6 +525,9 @@ namespace VHEmpAPI.Shared
             public string? PunchTime { get; set; }
             public string? ShiftTime { get; set; }
             public string? DefaultRole { get; set; }
+            public string? InchargeYN { get; set; }
+            public string? HODYN { get; set; }
+            public string? HRYN { get; set; }
         }
 
         [Keyless]
