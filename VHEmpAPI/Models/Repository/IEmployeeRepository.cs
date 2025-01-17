@@ -34,6 +34,7 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<DoctorNotification>> GetDrNotifications(string loginId, string EmpId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesList>> EmpApp_Get_LV_OT_RolesList(string EmpId, string LoginId, string RoleNm, string Flag);
         Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry);
+        Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId);
 
     }
 }

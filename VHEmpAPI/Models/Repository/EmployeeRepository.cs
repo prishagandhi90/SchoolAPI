@@ -528,6 +528,22 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveRejectReason @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
+        }
+
     }
 
 }
