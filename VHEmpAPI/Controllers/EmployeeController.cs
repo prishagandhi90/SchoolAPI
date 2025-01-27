@@ -1223,6 +1223,46 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("EmpApp_Get_LV_OT_Role_Rights")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_Get_LV_OT_Role_Rights(LoginId_EmpId_Lv_OT_Flag loginId_EmpId_Lv_OT_Flag)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId_Lv_OT_Flag.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_Get_LV_OT_Role_Rights(EmpId, loginId_EmpId_Lv_OT_Flag.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
         [HttpPost("EmpApp_Appr_Rej_LV_OT_Entry")]
         [Authorize]
         public async Task<ActionResult<dynamic>> EmpApp_Appr_Rej_LV_OT_Entry(Upd_Lv_OT_entry upd_Lv_OT_entry)

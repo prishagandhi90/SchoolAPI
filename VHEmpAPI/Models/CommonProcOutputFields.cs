@@ -531,6 +531,15 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class Resp_LV_OT_RolesRights
+        {
+            public string? DefaultRole { get; set; }
+            public string? InchargeYN { get; set; }
+            public string? HODYN { get; set; }
+            public string? HRYN { get; set; }
+        }
+
+        [Keyless]
         public class Upd_Lv_OT_entry
         {
             public string? LoginId { get; set; }
