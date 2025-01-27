@@ -1189,7 +1189,7 @@ namespace VHEmpAPI.Controllers
         {
             try
             {
-                string IsValid = "", EmpId = "";
+                string IsValid = "", EmpId = "", DefaultRole = "", InchargeYN = "", HODYN = "", HRYN = "";
                 var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string Token = WebUtility.UrlDecode(tokenNum);
 
@@ -1208,10 +1208,32 @@ namespace VHEmpAPI.Controllers
                 if (result == null)
                     return NotFound();
 
-                if (Ok(result).StatusCode != 200 || result.Count() == 0)
-                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+                Resp_LV_OT_RolesRights result_rights = new Resp_LV_OT_RolesRights();
+                result_rights = await EmpApp_Get_LV_OT_Role_Rights(loginId_EmpId_Lv_OT_Flag);
+                if (Ok(result).StatusCode == 200 || result.Count() > 0)
+                {
+                    if (result_rights != null)
+                    {
+                        // You can return all the properties of result_rights
+                        DefaultRole = result_rights.DefaultRole ?? "InCharge";
+                        InchargeYN = result_rights.InchargeYN ?? "N";
+                        HODYN = result_rights.HODYN ?? "N";
+                        HRYN = result_rights.HRYN ?? "N";
+                    }
+                    else
+                    {
+                        // If result_rights is null, return default values for each property
+                        DefaultRole = "";
+                        InchargeYN = "N";
+                        HODYN = "N";
+                        HRYN = "N";
+                    }
+                }
 
-                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", DefaultRole = DefaultRole, InchargeYN = InchargeYN, HODYN = HODYN, HRYN = HRYN, data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", DefaultRole = DefaultRole, InchargeYN = InchargeYN, HODYN = HODYN, HRYN = HRYN, data = result });
 
             }
             catch (Exception ex)
@@ -1224,8 +1246,7 @@ namespace VHEmpAPI.Controllers
         }
 
         [HttpPost("EmpApp_Get_LV_OT_Role_Rights")]
-        [Authorize]
-        public async Task<ActionResult<dynamic>> EmpApp_Get_LV_OT_Role_Rights(LoginId_EmpId_Lv_OT_Flag loginId_EmpId_Lv_OT_Flag)
+        public async Task<Resp_LV_OT_RolesRights> EmpApp_Get_LV_OT_Role_Rights(LoginId_EmpId_Lv_OT_Flag loginId_EmpId_Lv_OT_Flag)
         {
             try
             {
@@ -1240,23 +1261,42 @@ namespace VHEmpAPI.Controllers
                     EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
                     if (IsValid != "Y")
                     {
-                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                        return new Resp_LV_OT_RolesRights
+                        {
+                            DefaultRole = "",
+                            InchargeYN = "N",
+                            HODYN = "N",
+                            HRYN = "N"
+                        };
                     }
                 }
 
                 var result = await employeeRepository.EmpApp_Get_LV_OT_Role_Rights(EmpId, loginId_EmpId_Lv_OT_Flag.LoginId);
-                if (result == null)
-                    return NotFound();
+                if (result == null || !result.Any())
+                {
+                    return new Resp_LV_OT_RolesRights
+                    {
+                        DefaultRole = "",
+                        InchargeYN = "N",
+                        HODYN = "N",
+                        HRYN = "N"
+                    };
+                }
 
-                if (Ok(result).StatusCode != 200 || result.Count() == 0)
-                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+                var result_rights = result.FirstOrDefault(); // Adjust according to how you want to handle multiple results
 
-                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+                return new Resp_LV_OT_RolesRights
+                {
+                    DefaultRole = result_rights?.DefaultRole ?? "",
+                    InchargeYN = result_rights?.InchargeYN ?? "N",
+                    HODYN = result_rights?.HODYN ?? "N",
+                    HRYN = result_rights?.HRYN ?? "N"
+                };
 
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+                throw new Exception("Error fetching data: " + ex.Message);
             }
             finally
             {
