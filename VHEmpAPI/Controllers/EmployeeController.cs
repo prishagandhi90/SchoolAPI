@@ -1363,7 +1363,7 @@ namespace VHEmpAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> EmpApp_Appr_Rej_LV_OT_Entry_List(LoginId_Lst_LVOT LVOTList)
         {
-            var transaction = await employeeRepository.BeginTransaction(); // Begin Transaction
+            //var transaction = await employeeRepository.BeginTransaction(); // Begin Transaction
             try
             {
                 string IsValid = "", EmpId = "";
