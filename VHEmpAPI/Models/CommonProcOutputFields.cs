@@ -524,10 +524,17 @@ namespace VHEmpAPI.Shared
             public string? EmpTel { get; set; }
             public string? PunchTime { get; set; }
             public string? ShiftTime { get; set; }
-            public string? DefaultRole { get; set; }
-            public string? InchargeYN { get; set; }
-            public string? HODYN { get; set; }
-            public string? HRYN { get; set; }
+            //public string? DefaultRole { get; set; }
+            //public string? InchargeYN { get; set; }
+            //public string? HODYN { get; set; }
+            //public string? HRYN { get; set; }
+        }
+
+        [Keyless]
+        public class LoginId_Lst_LVOT
+        {
+            public string? LoginId { get; set; }
+            public List<Resp_LV_OT_RolesList>? List_Resp_LV_OT_Roles { get; set; }
         }
 
         [Keyless]

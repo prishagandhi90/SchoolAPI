@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 using VHEmpAPI.Shared;
 using static VHEmpAPI.Shared.CommonProcOutputFields;
 
@@ -6,6 +8,10 @@ namespace VHEmpAPI.Models.Repository
 {
     public interface IEmployeeRepository
     {
+        Task<IDbContextTransaction> BeginTransaction();
+        Task CommitTransaction(IDbContextTransaction transaction);
+        Task RollbackTransaction(IDbContextTransaction transaction);
+        Task DisposeTransaction(IDbContextTransaction transaction);
         Task<IEnumerable<TokenData>> ValidateMobile_Pass(MobileCreds mobileCreds);
         Task<IEnumerable<CommonProcOutputFields.IsValidToken>> IsTokenValid(string TokenNo, string LoginId);
         Task<IEnumerable<LoginId_TokenData>> Save_Token_UserCreds_and_ReturnToken(MobileCreds model, string TokenNo);
@@ -33,9 +39,11 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId);
         Task<IEnumerable<DoctorNotification>> GetDrNotifications(string loginId, string EmpId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesList>> EmpApp_Get_LV_OT_RolesList(string EmpId, string LoginId, string RoleNm, string Flag);
+        //Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry, IDbContextTransaction transaction);
         Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry);
         Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesRights>> EmpApp_Get_LV_OT_Role_Rights(string EmpId, string LoginId);
+        
 
     }
 }

@@ -1307,6 +1307,7 @@ namespace VHEmpAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> EmpApp_Appr_Rej_LV_OT_Entry(Upd_Lv_OT_entry upd_Lv_OT_entry)
         {
+            //var transaction = await employeeRepository.BeginTransaction();
             try
             {
                 string IsValid = "", EmpId = "";
@@ -1324,22 +1325,119 @@ namespace VHEmpAPI.Controllers
                     }
                 }
 
+                //var result = await employeeRepository.EmpApp_Upd_LV_OT_Entry(EmpId, upd_Lv_OT_entry, transaction);
                 var result = await employeeRepository.EmpApp_Upd_LV_OT_Entry(EmpId, upd_Lv_OT_entry);
+                //if (result == null)
+                //    return NotFound();
+
                 if (result == null)
-                    return NotFound();
+                {
+                    // If processing fails for any record, roll back the transaction
+                    //await employeeRepository.RollbackTransaction(transaction);
+                    return Ok(new { statusCode = 400, isSuccess = "false", message = "Failed to process one or more records", data = new { } });
+                }
 
                 if (Ok(result).StatusCode != 200 || result.Count() == 0)
                     return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                //await employeeRepository.CommitTransaction(transaction);
 
                 return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
 
             }
             catch (Exception ex)
             {
+                //await employeeRepository.RollbackTransaction(transaction);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
             }
             finally
             {
+                //if (transaction != null)
+                //{
+                //    await employeeRepository.DisposeTransaction(transaction);
+                //}
+            }
+        }
+
+        [HttpPost("EmpApp_Appr_Rej_LV_OT_Entry_List")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_Appr_Rej_LV_OT_Entry_List(LoginId_Lst_LVOT LVOTList)
+        {
+            var transaction = await employeeRepository.BeginTransaction(); // Begin Transaction
+            try
+            {
+                string IsValid = "", EmpId = "";
+
+                // Validate token
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, LVOTList.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).FirstOrDefault()?.ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).FirstOrDefault()?.ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                if (LVOTList != null && LVOTList.List_Resp_LV_OT_Roles.Any())
+                {
+                    Upd_Lv_OT_entry upd_Lv_OT_entry = new Upd_Lv_OT_entry();
+                    foreach (var modelRecord in LVOTList.List_Resp_LV_OT_Roles)
+                    {
+                        // Process each record in the list here
+                        // You can implement the logic for each role based on the flag value
+                        // Example: If flag is "Approve", you will approve the entry, else if "Reject", you will reject it.
+
+                        // Assuming some processing method is available to handle individual records
+
+                        upd_Lv_OT_entry = new Upd_Lv_OT_entry();
+                        upd_Lv_OT_entry.LoginId = LVOTList.LoginId;
+                        upd_Lv_OT_entry.EmpId = EmpId;
+                        upd_Lv_OT_entry.Flag = "HOD";
+                        upd_Lv_OT_entry.LeaveDetailId = modelRecord.LeaveId.ToString();
+                        upd_Lv_OT_entry.Action = "Approved";
+                        upd_Lv_OT_entry.Reason = modelRecord.Reason;
+                        upd_Lv_OT_entry.UserName = "";
+                        upd_Lv_OT_entry.Note = modelRecord.HoDNote;
+
+                        //var result = await employeeRepository.EmpApp_Upd_LV_OT_Entry(EmpId, upd_Lv_OT_entry, transaction); // Process the individual role
+                        var result = await employeeRepository.EmpApp_Upd_LV_OT_Entry(EmpId, upd_Lv_OT_entry); // Process the individual role
+
+                        //if (result == null)
+                        //{
+                        //    // If processing fails for any record, roll back the transaction
+                        //    await employeeRepository.RollbackTransaction(transaction);
+                        //    return Ok(new { statusCode = 400, isSuccess = "false", message = "Failed to process one or more records", data = new { } });
+                        //}
+                    }
+                }
+                else
+                {
+                    //await employeeRepository.RollbackTransaction(transaction);
+                    return Ok(new { statusCode = 400, isSuccess = "false", message = "No records to process", data = new { } });
+                }
+
+                // Commit the transaction if all records processed successfully
+                //await employeeRepository.CommitTransaction(transaction);
+
+                return Ok(new { statusCode = 200, isSuccess = "true", message = "Y", data = new { } });
+            }
+            catch (Exception ex)
+            {
+                // If exception occurs, rollback the transaction
+                //await employeeRepository.RollbackTransaction(transaction);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+                //if (transaction != null)
+                //{
+                //    await employeeRepository.DisposeTransaction(transaction);
+                //}
             }
         }
 

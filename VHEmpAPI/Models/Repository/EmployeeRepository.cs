@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Data;
@@ -14,11 +16,68 @@ namespace VHEmpAPI.Models.Repository
     {
         public AppDbContext AppDbContextAdm { get; }
         private readonly IDBMethods _dbMethods;
+        private IDbContextTransaction _transaction;
 
         public EmployeeRepository(AppDbContext appDbContext, IDBMethods dbm)
         {
             AppDbContextAdm = appDbContext;
             _dbMethods = dbm ?? throw new ArgumentNullException(nameof(dbm));
+        }
+
+        public async Task<IDbContextTransaction> BeginTransaction()
+        {
+            _transaction = await AppDbContextAdm.Database.BeginTransactionAsync();
+            return _transaction;
+        }
+
+        // Commit Transaction Method
+        public async Task CommitTransaction(IDbContextTransaction transaction)
+        {
+            try
+            {
+                if (transaction != null)
+                {
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception while committing
+                throw new InvalidOperationException("Error committing transaction: " + ex.Message);
+            }
+        }
+
+        // Rollback Transaction Method
+        public async Task RollbackTransaction(IDbContextTransaction transaction)
+        {
+            try
+            {
+                if (transaction != null)
+                {
+                    await transaction.RollbackAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception while rolling back
+                throw new InvalidOperationException("Error rolling back transaction: " + ex.Message);
+            }
+        }
+
+        public async Task DisposeTransaction(IDbContextTransaction transaction)
+        {
+            try
+            {
+                if (transaction != null)
+                {
+                    await transaction.DisposeAsync(); // Ensure proper disposal
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception while disposing the transaction
+                throw new InvalidOperationException("Error disposing transaction: " + ex.Message);
+            }
         }
 
         public async Task<IEnumerable<CommonProcOutputFields.TokenData>> ValidateMobile_Pass(MobileCreds mobileCreds)
@@ -64,7 +123,7 @@ namespace VHEmpAPI.Models.Repository
                                 "@p_TokenNo = '" + TokenNo + "', @p_DeviceType = '" + model.DeviceType + "'," +
                                 "@p_DeviceName = '" + model.DeviceName + "', @p_OSType = '" + model.OSType + "'," +
                                 "@p_DeviceId = '" + model.DeviceToken + "', @p_UserType = 'EMP', " +
-                                "@p_FirebaseId = '"+ model.FirebaseId +"' ";
+                                "@p_FirebaseId = '" + model.FirebaseId + "' ";
                 var GetToken = await AppDbContextAdm.LoginId_TokenData.FromSqlRaw(sqlStr).ToListAsync();
                 return GetToken;
             }
@@ -339,12 +398,12 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<Resp_value_name>)Enumerable.Empty<string>();
         }
-        
+
         public async Task<DataTable> GetEmpShiftReport(string EmpId, string LoginId, string DtRange)
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetEmpShiftReport @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_DtRange = '"+ DtRange + "' ";
+                string sqlStr = "exec dbo.EmpApp_GetEmpShiftReport @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_DtRange = '" + DtRange + "' ";
                 //var DashboardData = await AppDbContextAdm.DrDynamicDt.FromSqlRaw(sqlStr).ToListAsync();
                 //return DashboardData;
 
@@ -357,7 +416,7 @@ namespace VHEmpAPI.Models.Repository
                     return objresutl;
                 }
                 catch (Exception ex)
-                {}
+                { }
                 finally
                 {
                 }
@@ -490,7 +549,7 @@ namespace VHEmpAPI.Models.Repository
             try
             {
                 string sqlStr = "exec dbo.EmpApp_Get_LV_OT_Roles @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
-                                "@p_Role = '"+ RoleNm +"', @p_Flag = '" + Flag + "' ";
+                                "@p_Role = '" + RoleNm + "', @p_Flag = '" + Flag + "' ";
                 var Lv_Ot_Roles_Lst = await AppDbContextAdm.Resp_LV_OT_RolesList.FromSqlRaw(sqlStr).ToListAsync();
                 return Lv_Ot_Roles_Lst;
             }
@@ -516,6 +575,7 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_LV_OT_RolesRights>)Enumerable.Empty<string>();
         }
 
+        //public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry, IDbContextTransaction transaction)
         public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry)
         {
             try
@@ -524,7 +584,10 @@ namespace VHEmpAPI.Models.Repository
                                 "@p_Flag = '" + upd_Lv_OT_entry.Flag + "', @p_leavedetailid = '" + upd_Lv_OT_entry.LeaveDetailId + "', " +
                                 "@p_action = '" + upd_Lv_OT_entry.Action + "', @p_reason = '" + upd_Lv_OT_entry.Reason + "', " +
                                 "@p_usr_nm = '" + upd_Lv_OT_entry.UserName + "', @p_note = '" + upd_Lv_OT_entry.Note + "' ";
+
+
                 var savedYN = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
+                //var savedYN = await AppDbContextAdm.Database.ExecuteSqlRawAsync(sqlStr, transaction.GetDbTransaction());
                 return new List<CommonProcOutputFields.SavedYesNo>
                 {
                     new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" }
