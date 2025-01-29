@@ -511,6 +511,7 @@ namespace VHEmpAPI.Shared
             public decimal? OverTimeMinutes { get; set; }
             public string? LeaveDays { get; set; }
             public string? Reason { get; set; }
+            public string? Note { get; set; }
             public string? InchargeAction { get; set; }
             public string? HodAction { get; set; }
             public string? DeptInc { get; set; }
