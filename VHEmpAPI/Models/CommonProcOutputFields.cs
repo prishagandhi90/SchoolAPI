@@ -28,6 +28,14 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class LoginId_EmpId_ModuleNm
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? ModuleName { get; set; }
+        }
+
+        [Keyless]
         public class IsValidData
         {
             public string? IsValid { get; set; }
@@ -560,5 +568,19 @@ namespace VHEmpAPI.Shared
             public string? Note { get; set; }
 
         }
+
+        [Keyless]
+        public class ModuleScreenRights
+        {
+            public int? Id { get; set; }
+            public string? ModuleName { get; set; }
+            public string? ScreenName { get; set; }
+            public int? ModuleSeq { get; set; }
+            public int? ScreenSeq { get; set; }
+            public string? ImagePath { get; set; } // Nullable, agar DB me ho
+            public string? RightsYN { get; set; }  // "Y" or "N" type
+            public string? InactiveYN { get; set; } // "Y" or "N" type
+        }
+
     }
 }

@@ -96,8 +96,9 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_LV_OT_RolesRights>? Resp_LV_OT_RolesRights { get; set; }
-        
 
+        [NotMapped]
+        public DbSet<ModuleScreenRights>? Resp_ModuleScreenRights { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

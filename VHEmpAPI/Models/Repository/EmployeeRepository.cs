@@ -622,6 +622,22 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetEmpAppScreenRights(string EmpId, string LoginId, string ModuleName)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetEmpAppScreenRights @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "', @p_ModuleName = '" + ModuleName + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<ModuleScreenRights>)Enumerable.Empty<string>();
+        }
+
     }
 
 }
