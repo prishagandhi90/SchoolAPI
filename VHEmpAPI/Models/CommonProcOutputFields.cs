@@ -361,6 +361,7 @@ namespace VHEmpAPI.Shared
             public string? Usr_Nm { get; set; }
             public string? Reliever_Empcode { get; set; }
             public string? DelayLVNote {  get; set; }
+            public string? LeaveDivision { get; set; }
             public string? Flag { get; set; }
         }
 
@@ -524,6 +525,7 @@ namespace VHEmpAPI.Shared
             public string? HodAction { get; set; }
             public string? DeptInc { get; set; }
             public string? DeptHOD { get; set; }
+            public string? InchargeNote { get; set; }
             public string? HoDNote { get; set; }
             public string? HRNote { get; set; }
             public string? EnterDate { get; set; }

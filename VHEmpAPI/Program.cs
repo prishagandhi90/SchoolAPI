@@ -97,7 +97,25 @@ builder.Services.AddScoped<IDBMethods, DBMethods>();
 builder.Services.AddScoped<IEmpLoginRepository, EmpLoginRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
+
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
+
+
 var app = builder.Build();
+app.UseCors(MyAllowSpecificOrigins);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

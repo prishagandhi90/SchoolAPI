@@ -363,7 +363,8 @@ namespace VHEmpAPI.Models.Repository
                                 "@p_reason = '" + saveLeaveEntry.Reason + "', @p_note = '" + saveLeaveEntry.Note + "', " +
                                 "@p_leavedays = '" + saveLeaveEntry.LeaveDays + "', @p_overtimeminutes = '" + saveLeaveEntry.OverTimeMinutes + "', " +
                                 "@p_usr_nm = '" + saveLeaveEntry.Usr_Nm + "', @p_reliever_empcode = '" + saveLeaveEntry.Reliever_Empcode + "', " +
-                                "@p_DelayLVNote = '" + saveLeaveEntry.DelayLVNote + "', @p_Flag = '" + saveLeaveEntry.Flag + "' ";
+                                "@p_DelayLVNote = '" + saveLeaveEntry.DelayLVNote + "', @p_LeaveDivision = '" + saveLeaveEntry.LeaveDivision + "', " +
+                                "@p_Flag = '" + saveLeaveEntry.Flag + "' ";
                 var DashboardData = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
                 return new List<CommonProcOutputFields.SavedYesNo>
                 {
