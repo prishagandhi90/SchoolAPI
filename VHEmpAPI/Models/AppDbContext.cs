@@ -99,6 +99,14 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<ModuleScreenRights>? Resp_ModuleScreenRights { get; set; }
+
+        [NotMapped]
+        public DbSet<Organizations> Organizations { get; set; }
+
+        [NotMapped]
+        public DbSet<PatientList> PatientList { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

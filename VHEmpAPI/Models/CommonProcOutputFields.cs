@@ -584,5 +584,62 @@ namespace VHEmpAPI.Shared
             public string? InactiveYN { get; set; } // "Y" or "N" type
         }
 
+        [Keyless]
+        public class FilteredPatientData
+        {
+            public string? LoginId { get; set; }
+            public string? PrefixText { get; set; } = "";
+            public List<string>? Orgs { get; set; }
+            public List<string>? Floors { get; set; }
+            public List<string>? Wards { get; set; }
+        }
+
+        [Keyless]
+        public class SortDrPatientData
+        {
+            public string? LoginId { get; set; }
+            public string? SortType { get; set; } = "";
+        }
+
+        [Keyless]
+        public class GetDashboardFilters
+        {
+            public List<Organizations>? Orgs { get; set; }
+            public List<Floors>? Floors { get; set; }
+            public List<Wards>? Wards { get; set; }
+        }
+
+        [Keyless]
+        public class Organizations
+        {
+            public string? IsValidToken { get; set; }
+            public string? Organization { get; set; }
+        }
+
+        [Keyless]
+        public class OrgDropdown
+        {
+            public int? OrgId { get; set; }
+            public string? Organization { get; set; }
+        }
+
+        [Keyless]
+        public class PatientList
+        {
+            public string? IsValidToken { get; set; }
+            public string? PatientCategory { get; set; }
+            public string? UHID { get; set; }
+            public string? IPDNo { get; set; }
+            public string? PatientName { get; set; }
+            public string? BedNo { get; set; }
+            public string? Ward { get; set; }
+            public string? Floor { get; set; }
+            public string? DOA { get; set; }
+            public string? AdmType { get; set; }
+            public string? TotalDays { get; set; }
+            public string? ReferredDr { get; set; }
+            public string? MobileNo { get; set; }
+        }
+
     }
 }

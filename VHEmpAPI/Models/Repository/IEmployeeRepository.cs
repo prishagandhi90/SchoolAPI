@@ -34,6 +34,7 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds);
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> SortDr_PrecriptionViewer(string EmpId, string LoginId, string SortType);
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionMedicines>> GetDrPrescriptionMedicines(string EmpId, string LoginId, string MstId);
+        Task<IEnumerable<Organizations>> GetOrganizations(string DrId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Floors>> GetFloors(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Wards>> GetWards(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId);
@@ -44,6 +45,10 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesRights>> EmpApp_Get_LV_OT_Role_Rights(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetEmpAppScreenRights(string EmpId, string LoginId, string ModuleName);
+
+        //Task<IEnumerable<CommonProcOutputFields.PatientList>> SearchPatientList(string TokenNo, string prefixText);
+        Task<IEnumerable<CommonProcOutputFields.PatientList>> GetFilteredPatientData(string DrId, string LoginId, string PrefixText, List<string> Orgs, List<string> Floors, List<string> Wards);
+        Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDrPatientList(string DrId, string LoginId, string SortType);
 
     }
 }

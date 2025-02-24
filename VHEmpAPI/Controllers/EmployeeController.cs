@@ -1520,5 +1520,167 @@ namespace VHEmpAPI.Controllers
             {
             }
         }
+
+
+        [HttpPost("GetPatientDashboardFilters")]
+        [Authorize]
+        public async Task<ActionResult<GetDashboardFilters>> GetPatientDashboardFilters(LoginIdNum loginIdNum)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginIdNum.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var Orgs = await employeeRepository.GetOrganizations(EmpId, loginIdNum.LoginId);
+                var Floors = await employeeRepository.GetFloors(EmpId, loginIdNum.LoginId);
+                var Wards = await employeeRepository.GetWards(EmpId, loginIdNum.LoginId);
+
+                var result = new GetDashboardFilters
+                {
+                    Orgs = (List<Organizations>)Orgs,
+                    Floors = (List<Floors>)Floors,
+                    Wards = (List<Wards>)Wards,
+                };
+
+                if (result == null)
+                    return NotFound();
+
+                return Ok(new { statusCode = Ok(result).StatusCode, isSuccess = "true", message = "Success!", data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetOrganizations")]
+        [Authorize]
+        public async Task<ActionResult<Organizations>> GetOrganizations(LoginIdNum loginIdNum)
+        {
+            try
+            {
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+                var result = await employeeRepository.GetOrganizations(tokenNum, loginIdNum.LoginId);
+                if (result == null)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+
+        [HttpPost("GetFilteredPatientData")]
+        [Authorize]
+        public async Task<ActionResult<PatientList>> GetFilteredPatientData([FromBody] FilteredPatientData filteredPatientData = null)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, filteredPatientData.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                List<PatientList> result = new List<PatientList>();
+                if (filteredPatientData != null)
+                    result = (List<PatientList>)await employeeRepository.GetFilteredPatientData(EmpId, filteredPatientData.LoginId, filteredPatientData.PrefixText, filteredPatientData.Orgs, filteredPatientData.Floors, filteredPatientData.Wards);
+                else
+                    result = (List<PatientList>)await employeeRepository.GetFilteredPatientData(EmpId, filteredPatientData.LoginId, filteredPatientData.PrefixText, new List<string>(), new List<string>(), new List<string>());
+
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or Something went wrong!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("SortDrPatientList")]
+        [Authorize]
+        public async Task<ActionResult<PatientList>> SortDrPatientList([FromBody] SortDrPatientData sortPatientData = null)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, sortPatientData.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                List<PatientList> result = new List<PatientList>();
+                if (sortPatientData != null)
+                    result = (List<PatientList>)await employeeRepository.SortDrPatientList(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
+                else
+                    result = (List<PatientList>)await employeeRepository.SortDrPatientList(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
+
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or Something went wrong!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
     }
 }

@@ -639,6 +639,58 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<ModuleScreenRights>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.Organizations>> GetOrganizations(string DrId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_GetOrganizations @p_DrId = '" + DrId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Organizations.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Organizations>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.PatientList>> GetFilteredPatientData(string DrId, string LoginId, string PrefixText, List<string> Orgs, List<string> Floors, List<string> Wards)
+        {
+            try
+            {
+                string Orgs_commaSep = string.Join(",", Orgs);
+                string Floors_commaSep = string.Join(",", Floors);
+                string Wards_commaSep = string.Join(",", Wards);
+                string sqlStr = "exec dbo.DrApp_GetDrPatientList @p_DrId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
+                                "@p_PrefixText = '" + PrefixText + "', @p_Orgs = '" + Orgs_commaSep + "', " +
+                                "@p_Floors = '" + Floors_commaSep + "', @p_Wards = '" + Wards_commaSep + "' ";
+                var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<PatientList>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDrPatientList(string DrId, string LoginId, string SortType)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_SortDrPatientList @p_DrId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
+                                "@p_SortType = '" + SortType + "' ";
+                var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<PatientList>)Enumerable.Empty<string>();
+        }
+
     }
 
 }
