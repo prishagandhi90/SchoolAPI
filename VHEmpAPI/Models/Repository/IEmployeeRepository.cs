@@ -44,11 +44,13 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry);
         Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesRights>> EmpApp_Get_LV_OT_Role_Rights(string EmpId, string LoginId);
+        Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetModuleRights(string EmpId, string LoginId, string ModuleName); 
         Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetEmpAppScreenRights(string EmpId, string LoginId, string ModuleName);
 
         //Task<IEnumerable<CommonProcOutputFields.PatientList>> SearchPatientList(string TokenNo, string prefixText);
         Task<IEnumerable<CommonProcOutputFields.PatientList>> GetFilteredPatientData(string DrId, string LoginId, string PrefixText, List<string> Orgs, List<string> Floors, List<string> Wards);
         Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDrPatientList(string DrId, string LoginId, string SortType);
+        Task<DataSet> GetPatientLabReports(string DrId, string IpdNo, string UHID);
 
     }
 }

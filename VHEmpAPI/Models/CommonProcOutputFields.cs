@@ -641,5 +641,13 @@ namespace VHEmpAPI.Shared
             public string? MobileNo { get; set; }
         }
 
+        [Keyless]
+        public class DrRadiologyData
+        {
+            public string? LoginId { get; set; }
+            public string? IpdNo { get; set; }
+            public string? UHID { get; set; }
+        }
+
     }
 }

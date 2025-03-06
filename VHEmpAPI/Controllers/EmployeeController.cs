@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using System.Data;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace VHEmpAPI.Controllers
 {
@@ -1481,6 +1482,46 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("GetModuleRights")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetModuleRights(LoginId_EmpId_ModuleNm loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.GetModuleRights(EmpId, loginId_EmpId.LoginId, loginId_EmpId.ModuleName);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
         [HttpPost("GetEmpAppScreenRights")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetEmpAppScreenRights(LoginId_EmpId_ModuleNm loginId_EmpId)
@@ -1671,6 +1712,102 @@ namespace VHEmpAPI.Controllers
                     return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or Something went wrong!", data = new { } });
 
                 return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetPatientLabReports")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetPatientLabReports([FromBody] DrRadiologyData drRadiologyData)
+        {
+            //DataSet ds = new DataSet();
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, drRadiologyData.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                DataSet result = await employeeRepository.GetPatientLabReports(EmpId, drRadiologyData.IpdNo, drRadiologyData.UHID);
+                if (result == null)
+                    return NotFound();
+
+                JArray JsonInnerObjList = new JArray();
+                var jsonResult = new JObject();
+                var innerjsonResult = new JObject();
+                var OutputJsonResult = new JObject();
+
+                //for (int i = 1; i < result.Tables.Count; i++)
+                //{
+                //    //string tableName = $"Table{i + 1}";
+                //    string tableName = result.Tables[i].Rows.Count > 0 ? result.Tables[i].Rows[0]["FormatTest"].ToString() : $"Table{i + 1}";
+                //    DataTable table = result.Tables[i];
+                //    jsonResult[tableName] = JToken.FromObject(table);
+                //    //ds.Tables.Add(table);
+                //}
+
+                //OutputJsonResult["statusCode"] = Ok(result).StatusCode;
+                //OutputJsonResult["IsSuccess"] = "true";
+                //OutputJsonResult["Message"] = "Data fetched successfully";
+                //OutputJsonResult["data"] = jsonResult;
+
+                for (int i = 1; i < result.Tables.Count; i++)
+                {
+                    //string tableName = $"Table{i + 1}";
+                    string tableName = result.Tables[i].Rows.Count > 0 ? result.Tables[i].Rows[0]["FormatTest"].ToString() : $"Table{i + 1}";
+                    DataTable table = result.Tables[i];
+                    innerjsonResult = new JObject
+                    {
+                        ["report_name"] = tableName,
+                        ["data"] = JToken.FromObject(table)
+                    };
+                    JsonInnerObjList.Add(innerjsonResult);
+                    //ds.Tables.Add(table);
+                }
+
+                if (result.Tables.Count > 0)
+                {
+                    OutputJsonResult = new JObject
+                    {
+                        ["PatientName"] = result.Tables[0].Rows.Count > 0 ? result.Tables[0].Rows[0]["PatientName"].ToString() : "",
+                        ["BedNo"] = result.Tables[0].Rows.Count > 0 ? result.Tables[0].Rows[0]["BedNo"].ToString() : "",
+                        ["Data"] = JsonInnerObjList
+                    };
+                }
+
+                var FinalOutput = new JObject
+                {
+                    ["statusCode"] = Ok(result).StatusCode,
+                    ["IsSuccess"] = "true",
+                    ["Message"] = "Data fetched successfully",
+                    ["data"] = OutputJsonResult
+                };
+
+                //string jsonDt = JsonConvert.SerializeObject(result);
+                if (Ok(result).StatusCode != 200 || result.Tables.Count == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(FinalOutput.ToString(Formatting.None));
+
+                //return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = jsonDt });
+                //return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = jsonResult.ToString(Formatting.None) });
 
             }
             catch (Exception ex)

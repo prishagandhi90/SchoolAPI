@@ -623,6 +623,22 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetModuleRights(string EmpId, string LoginId, string ModuleName)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetModuleRights @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "', @p_ModuleName = '" + ModuleName + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<ModuleScreenRights>)Enumerable.Empty<string>();
+        }
+
         public async Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetEmpAppScreenRights(string EmpId, string LoginId, string ModuleName)
         {
             try
@@ -689,6 +705,35 @@ namespace VHEmpAPI.Models.Repository
 
             }
             return (IEnumerable<PatientList>)Enumerable.Empty<string>();
+        }
+
+        public async Task<DataSet> GetPatientLabReports(string DrId, string IpdNo, string UHID)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_GetPatientLabReports @p_UHID = '" + UHID + "', @p_IpdNo = '" + IpdNo + "' ";
+                DataSet objresutl = new DataSet();
+
+                try
+                {
+                    objresutl = _dbMethods.GetDataSet(sqlStr);
+
+                    return objresutl;
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally
+                {
+                }
+                return objresutl;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return new DataSet();
         }
 
     }
