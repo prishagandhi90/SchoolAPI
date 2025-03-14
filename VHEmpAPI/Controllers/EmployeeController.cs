@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Data;
 using System.Globalization;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace VHEmpAPI.Controllers
 {
@@ -1773,6 +1774,26 @@ namespace VHEmpAPI.Controllers
                     //string tableName = $"Table{i + 1}";
                     string tableName = result.Tables[i].Rows.Count > 0 ? result.Tables[i].Rows[0]["FormatTest"].ToString() : $"Table{i + 1}";
                     DataTable table = result.Tables[i];
+                    for (int j = 0; j < table.Columns.Count; j++)
+                    {
+                        string colName = table.Columns[j].ColumnName.ToLower(); // Convert to lowercase for comparison
+
+                        if (colName == "day_0")
+                            table.Columns[j].ColumnName = DateTime.Now.ToString("dd-MM-yyyy"); // Aaj ki date
+                        else if (colName == "day_1")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy");
+                        else if (colName == "day_2")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-2).ToString("dd-MM-yyyy");
+                        else if (colName == "day_3")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-3).ToString("dd-MM-yyyy");
+                        else if (colName == "day_4")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-4).ToString("dd-MM-yyyy");
+                        else if (colName == "day_5")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-5).ToString("dd-MM-yyyy");
+                        else if (colName == "day_6")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-6).ToString("dd-MM-yyyy");
+                    }
+
                     innerjsonResult = new JObject
                     {
                         ["report_name"] = tableName,
