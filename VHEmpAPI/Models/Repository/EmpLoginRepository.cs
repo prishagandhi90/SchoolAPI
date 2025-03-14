@@ -99,7 +99,7 @@ namespace VHEmpAPI.Models.Repository
                     respOTP.MobileNo = otp.Select(x => x.MobileNo).ToList()[0].ToString();
                 }
 
-                if (!String.IsNullOrEmpty(SMSOtp))
+                if (1==2 && !String.IsNullOrEmpty(SMSOtp))
                 {
                     //if (respOTP.MobileNo == "9429728770")
                     //if (respOTP.MobileNo == "9429728770"

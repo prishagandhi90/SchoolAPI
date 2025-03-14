@@ -678,7 +678,7 @@ namespace VHEmpAPI.Models.Repository
                 string Orgs_commaSep = string.Join(",", Orgs);
                 string Floors_commaSep = string.Join(",", Floors);
                 string Wards_commaSep = string.Join(",", Wards);
-                string sqlStr = "exec dbo.DrApp_GetDrPatientList @p_DrId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
+                string sqlStr = "exec dbo.EmpApp_GetDeptPatientList @p_EmpId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
                                 "@p_PrefixText = '" + PrefixText + "', @p_Orgs = '" + Orgs_commaSep + "', " +
                                 "@p_Floors = '" + Floors_commaSep + "', @p_Wards = '" + Wards_commaSep + "' ";
                 var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
@@ -711,7 +711,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_GetPatientLabReports @p_UHID = '" + UHID + "', @p_IpdNo = '" + IpdNo + "' ";
+                string sqlStr = "exec dbo.EmpApp_GetPatientLabSummaryData @p_UHID = '" + UHID + "', @p_IpdNo = '" + IpdNo + "' ";
                 DataSet objresutl = new DataSet();
 
                 try
