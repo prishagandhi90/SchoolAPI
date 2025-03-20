@@ -486,7 +486,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_GetWards @p_DrId = '" + EmpId + "', " +
+                string sqlStr = "exec dbo.EmpApp_GetWards @p_EmpId = '" + EmpId + "', " +
                                 "@p_LoginId = '" + LoginId + "' ";
                 var DashboardData = await AppDbContextAdm.Wards.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
@@ -502,7 +502,7 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_GetFloors @p_DrId = '" + EmpId + "', " +
+                string sqlStr = "exec dbo.EmpApp_GetFloors @p_EmpId = '" + EmpId + "', " +
                                 "@p_LoginId = '" + LoginId + "' ";
                 var DashboardData = await AppDbContextAdm.Floors.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
@@ -655,11 +655,11 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<ModuleScreenRights>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Organizations>> GetOrganizations(string DrId, string LoginId)
+        public async Task<IEnumerable<CommonProcOutputFields.Organizations>> GetOrganizations(string EmpId, string LoginId)
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_GetOrganizations @p_DrId = '" + DrId + "', " +
+                string sqlStr = "exec dbo.EmpApp_GetOrganizations @p_EmpId = '" + EmpId + "', " +
                                 "@p_LoginId = '" + LoginId + "' ";
                 var DashboardData = await AppDbContextAdm.Organizations.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
@@ -691,11 +691,11 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<PatientList>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDrPatientList(string DrId, string LoginId, string SortType)
+        public async Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDeptPatientList(string EmpId, string LoginId, string SortType)
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_SortDrPatientList @p_DrId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
+                string sqlStr = "exec dbo.EmpApp_SortDeptPatientList @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
                                 "@p_SortType = '" + SortType + "' ";
                 var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
                 return DashboardData;
@@ -708,6 +708,35 @@ namespace VHEmpAPI.Models.Repository
         }
 
         public async Task<DataSet> GetPatientLabReports(string DrId, string IpdNo, string UHID)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.DrApp_GetPatientLabReports @p_UHID = '" + UHID + "', @p_IpdNo = '" + IpdNo + "' ";
+                DataSet objresutl = new DataSet();
+
+                try
+                {
+                    objresutl = _dbMethods.GetDataSet(sqlStr);
+
+                    return objresutl;
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally
+                {
+                }
+                return objresutl;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return new DataSet();
+        }
+
+        public async Task<DataSet> GetPatientSummaryLabData(string DrId, string IpdNo, string UHID)
         {
             try
             {

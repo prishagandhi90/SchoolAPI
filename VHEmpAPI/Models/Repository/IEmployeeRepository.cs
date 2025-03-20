@@ -34,7 +34,7 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds);
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> SortDr_PrecriptionViewer(string EmpId, string LoginId, string SortType);
         Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionMedicines>> GetDrPrescriptionMedicines(string EmpId, string LoginId, string MstId);
-        Task<IEnumerable<Organizations>> GetOrganizations(string DrId, string LoginId);
+        Task<IEnumerable<Organizations>> GetOrganizations(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Floors>> GetFloors(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Wards>> GetWards(string EmpId, string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Beds>> GetBeds(string EmpId, string LoginId);
@@ -49,8 +49,9 @@ namespace VHEmpAPI.Models.Repository
 
         //Task<IEnumerable<CommonProcOutputFields.PatientList>> SearchPatientList(string TokenNo, string prefixText);
         Task<IEnumerable<CommonProcOutputFields.PatientList>> GetFilteredPatientData(string DrId, string LoginId, string PrefixText, List<string> Orgs, List<string> Floors, List<string> Wards);
-        Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDrPatientList(string DrId, string LoginId, string SortType);
+        Task<IEnumerable<CommonProcOutputFields.PatientList>> SortDeptPatientList(string EmpId, string LoginId, string SortType);
         Task<DataSet> GetPatientLabReports(string DrId, string IpdNo, string UHID);
+        Task<DataSet> GetPatientSummaryLabData(string DrId, string IpdNo, string UHID);
 
     }
 }

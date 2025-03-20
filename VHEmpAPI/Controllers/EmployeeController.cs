@@ -1679,9 +1679,9 @@ namespace VHEmpAPI.Controllers
             }
         }
 
-        [HttpPost("SortDrPatientList")]
+        [HttpPost("SortDeptPatientList")]
         [Authorize]
-        public async Task<ActionResult<PatientList>> SortDrPatientList([FromBody] SortDrPatientData sortPatientData = null)
+        public async Task<ActionResult<PatientList>> SortDeptPatientList([FromBody] SortDrPatientData sortPatientData = null)
         {
             try
             {
@@ -1702,9 +1702,9 @@ namespace VHEmpAPI.Controllers
 
                 List<PatientList> result = new List<PatientList>();
                 if (sortPatientData != null)
-                    result = (List<PatientList>)await employeeRepository.SortDrPatientList(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
+                    result = (List<PatientList>)await employeeRepository.SortDeptPatientList(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
                 else
-                    result = (List<PatientList>)await employeeRepository.SortDrPatientList(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
+                    result = (List<PatientList>)await employeeRepository.SortDeptPatientList(EmpId, sortPatientData.LoginId, sortPatientData.SortType);
 
                 if (result == null)
                     return NotFound();
@@ -1774,26 +1774,7 @@ namespace VHEmpAPI.Controllers
                     //string tableName = $"Table{i + 1}";
                     string tableName = result.Tables[i].Rows.Count > 0 ? result.Tables[i].Rows[0]["FormatTest"].ToString() : $"Table{i + 1}";
                     DataTable table = result.Tables[i];
-                    for (int j = 0; j < table.Columns.Count; j++)
-                    {
-                        string colName = table.Columns[j].ColumnName.ToLower(); // Convert to lowercase for comparison
-
-                        if (colName == "day_0")
-                            table.Columns[j].ColumnName = DateTime.Now.ToString("dd-MM-yyyy"); // Aaj ki date
-                        else if (colName == "day_1")
-                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy");
-                        else if (colName == "day_2")
-                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-2).ToString("dd-MM-yyyy");
-                        else if (colName == "day_3")
-                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-3).ToString("dd-MM-yyyy");
-                        else if (colName == "day_4")
-                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-4).ToString("dd-MM-yyyy");
-                        else if (colName == "day_5")
-                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-5).ToString("dd-MM-yyyy");
-                        else if (colName == "day_6")
-                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-6).ToString("dd-MM-yyyy");
-                    }
-
+                    
                     innerjsonResult = new JObject
                     {
                         ["report_name"] = tableName,
@@ -1819,6 +1800,125 @@ namespace VHEmpAPI.Controllers
                     ["IsSuccess"] = "true",
                     ["Message"] = "Data fetched successfully",
                     ["data"] = OutputJsonResult
+                };
+
+                //string jsonDt = JsonConvert.SerializeObject(result);
+                if (Ok(result).StatusCode != 200 || result.Tables.Count == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(FinalOutput.ToString(Formatting.None));
+
+                //return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = jsonDt });
+                //return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = jsonResult.ToString(Formatting.None) });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("GetPatientSummaryLabData")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetPatientSummaryLabData([FromBody] DrRadiologyData drRadiologyData)
+        {
+            //DataSet ds = new DataSet();
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, drRadiologyData.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                DataSet result = await employeeRepository.GetPatientSummaryLabData(EmpId, drRadiologyData.IpdNo, drRadiologyData.UHID);
+                if (result == null)
+                    return NotFound();
+
+                JArray JsonInnerObjList = new JArray();
+                var jsonResult = new JObject();
+                var innerjsonResult = new JObject();
+                var OutputJsonResult = new JObject();
+
+                //for (int i = 1; i < result.Tables.Count; i++)
+                //{
+                //    //string tableName = $"Table{i + 1}";
+                //    string tableName = result.Tables[i].Rows.Count > 0 ? result.Tables[i].Rows[0]["FormatTest"].ToString() : $"Table{i + 1}";
+                //    DataTable table = result.Tables[i];
+                //    jsonResult[tableName] = JToken.FromObject(table);
+                //    //ds.Tables.Add(table);
+                //}
+
+                //OutputJsonResult["statusCode"] = Ok(result).StatusCode;
+                //OutputJsonResult["IsSuccess"] = "true";
+                //OutputJsonResult["Message"] = "Data fetched successfully";
+                //OutputJsonResult["data"] = jsonResult;
+
+                for (int i = 1; i < result.Tables.Count; i++)
+                {
+                    //string tableName = $"Table{i + 1}";
+                    string tableName = result.Tables[i].Rows.Count > 0 ? result.Tables[i].Rows[0]["FormatTest"].ToString() : $"Table{i + 1}";
+                    DataTable table = result.Tables[i];
+                    for (int j = 0; j < table.Columns.Count; j++)
+                    {
+                        string colName = table.Columns[j].ColumnName.ToLower(); // Convert to lowercase for comparison
+
+                        if (colName == "day_0")
+                            table.Columns[j].ColumnName = DateTime.Now.ToString("dd-MM-yyyy"); // Aaj ki date
+                        else if (colName == "day_1")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy");
+                        else if (colName == "day_2")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-2).ToString("dd-MM-yyyy");
+                        else if (colName == "day_3")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-3).ToString("dd-MM-yyyy");
+                        else if (colName == "day_4")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-4).ToString("dd-MM-yyyy");
+                        else if (colName == "day_5")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-5).ToString("dd-MM-yyyy");
+                        else if (colName == "day_6")
+                            table.Columns[j].ColumnName = DateTime.Now.AddDays(-6).ToString("dd-MM-yyyy");
+                    }
+
+                    innerjsonResult = new JObject
+                    {
+                        //["report_name"] = tableName,
+                        ["PatientName"] = result.Tables[0].Rows.Count > 0 ? result.Tables[0].Rows[0]["PatientName"].ToString() : "",
+                        ["BedNo"] = result.Tables[0].Rows.Count > 0 ? result.Tables[0].Rows[0]["BedNo"].ToString() : "",
+                        ["LabData"] = JToken.FromObject(table)
+                    };
+                    JsonInnerObjList.Add(innerjsonResult);
+                    //ds.Tables.Add(table);
+                }
+
+                //if (result.Tables.Count > 0)
+                //{
+                //    OutputJsonResult = new JObject
+                //    {
+                //        ["PatientName"] = result.Tables[0].Rows.Count > 0 ? result.Tables[0].Rows[0]["PatientName"].ToString() : "",
+                //        ["BedNo"] = result.Tables[0].Rows.Count > 0 ? result.Tables[0].Rows[0]["BedNo"].ToString() : "",
+                //        //["ReportDetails"] = JsonInnerObjList
+                //    };
+                //}
+
+                var FinalOutput = new JObject
+                {
+                    ["statusCode"] = Ok(result).StatusCode,
+                    ["IsSuccess"] = "true",
+                    ["Message"] = "Data fetched successfully",
+                    //["data"] = OutputJsonResult
+                    ["data"] = innerjsonResult
                 };
 
                 //string jsonDt = JsonConvert.SerializeObject(result);
