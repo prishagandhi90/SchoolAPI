@@ -245,5 +245,27 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<Resp_LoginAs_Creds>)Enumerable.Empty<string>();
         }
+
+        public async Task<bool> ReportIssueAsync(IssueReportDto issue)
+        {
+            try
+            {
+                string sql = $"EXEC dbo.EmpApp_ReportIssue " +
+                             $"@p_ScreenName = '{issue.ScreenName}', " +
+                             $"@p_ErrorMessage = '{issue.ErrorMessage}', " +
+                             $"@p_LoginID = '{issue.LoginID}', " +
+                             $"@p_TokenNo = '{issue.TokenNo}', " +
+                             $"@p_EmpID = '{issue.EmpID}', " +
+                             $"@p_DeviceInfo = '{issue.DeviceInfo}'";
+
+                await AppDbContextAdm.Database.ExecuteSqlRawAsync(sql);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log the exception if needed
+                return false;
+            }
+        }
     }
 }

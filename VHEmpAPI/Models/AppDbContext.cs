@@ -87,7 +87,7 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<DoctorNotification> DrNotification { get; set; }
-
+        
         [NotMapped]
         public DbSet<Resp_LoginAs_Creds> Resp_LoginAs_Creds { get; set; }
 
@@ -106,6 +106,8 @@ namespace VHEmpAPI.Models
         [NotMapped]
         public DbSet<PatientList> PatientList { get; set; }
 
+        [NotMapped]
+        public DbSet<EMPNotificationList> EMPNotifyList { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

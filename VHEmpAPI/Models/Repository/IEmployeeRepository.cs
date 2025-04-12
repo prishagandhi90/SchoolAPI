@@ -53,5 +53,7 @@ namespace VHEmpAPI.Models.Repository
         Task<DataSet> GetPatientLabReports(string DrId, string IpdNo, string UHID);
         Task<DataSet> GetPatientSummaryLabData(string DrId, string IpdNo, string UHID);
 
+        Task<IEnumerable<EMPNotificationList>> GetEMPNotificationsList(string loginId, string EmpId, int? days, string? tag, string? fromDate, string? toDate);
+
     }
 }

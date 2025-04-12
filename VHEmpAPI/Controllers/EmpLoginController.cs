@@ -241,5 +241,35 @@ namespace VHEmpAPI.Controllers
             {
             }
         }
+
+        [HttpPost("PostIssue")]
+        //[Authorize]
+        public async Task<IActionResult> PostIssue([FromBody] IssueReportDto issue)
+        {
+            try
+            {
+                if (issue == null || string.IsNullOrWhiteSpace(issue.ScreenName))
+                {
+                    return BadRequest("Invalid data");
+                }
+
+                var result = await empLoginRepository.ReportIssueAsync(issue);
+
+                if (result == null)
+                    return NotFound();
+
+                if (result)
+                    return Ok(new { message = "Issue reported successfully" });
+
+                return StatusCode(500, "Failed to report issue");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
     }
 }

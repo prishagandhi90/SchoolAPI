@@ -10,6 +10,7 @@ using System.Data;
 using System.Globalization;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 
 namespace VHEmpAPI.Controllers
 {
@@ -19,12 +20,18 @@ namespace VHEmpAPI.Controllers
     {
         private readonly IEmployeeRepository? employeeRepository;
         private readonly IJwtAuth jwtAuth;
+        private readonly IConfiguration _configuration;
         public string Message = "";
+        //private readonly string _basePath = @"C:\inetpub\wwwroot\VHMobileAPI\Uploads";
+        //private readonly string _basePath = @"C:\inetpub\wwwroot\VHTestEmpAPI\Uploads";
+        private readonly string _basePath;
 
-        public EmployeeController(IEmployeeRepository employeeRepository, IJwtAuth jwtAuth)
+        public EmployeeController(IEmployeeRepository employeeRepository, IJwtAuth jwtAuth, IConfiguration configuration)
         {
             this.employeeRepository = employeeRepository;
             this.jwtAuth = jwtAuth;
+            _configuration = configuration;
+            _basePath = _configuration["FileUploadSettings:BasePath"] ?? @"C:\inetpub\wwwroot";
         }
 
         [HttpPost("authentication")]
@@ -1938,6 +1945,192 @@ namespace VHEmpAPI.Controllers
             finally
             {
             }
+        }
+
+
+        [HttpPost("GetEMPNotificationsList")]
+        [Authorize]
+        public async Task<ActionResult<EMPNotificationList>> GetEMPNotificationsList([FromBody] LoginId__AdmPatients_Days_Tag loginIdNum)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginIdNum.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.GetEMPNotificationsList(loginIdNum.LoginId, EmpId, loginIdNum.Days, loginIdNum.Tag, loginIdNum.FromDate, loginIdNum.ToDate);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or no data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+
+            }
+            finally
+            {
+
+            }
+        }
+
+        [HttpPost("GetNotificationFiles")]
+        public async Task<IActionResult> GetNotificationFiles([FromBody] LoginId_FileIndex loginIdNum)
+        {
+            string IsValid = "", EmpId = "";
+            var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            string Token = WebUtility.UrlDecode(tokenNum);
+
+            var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginIdNum.LoginId);
+            if (isValidToken != null)
+            {
+                IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                if (IsValid != "Y")
+                {
+                    return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                }
+            }
+
+            //string doctorFolder = Path.Combine(_basePath, "541".ToString());
+            string doctorFolder = Path.Combine(_basePath, loginIdNum.NotificationId.ToString());
+
+            if (!Directory.Exists(doctorFolder))
+            {
+                return Ok(new { statusCode = 404, isSuccess = "false", message = "No folder found for this doctor.", data = new { } });
+            }
+
+            // Asynchronously get files from the directory
+            var files = await Task.Run(() => Directory.GetFiles(doctorFolder));
+            if (files.Length == 0)
+            {
+                return Ok(new { statusCode = 404, isSuccess = "false", message = "No photo found for this doctor.", data = new { } });
+            }
+
+
+
+
+
+
+
+
+
+
+
+            try
+            {
+                // List to store multiple files
+                var fileList = new List<object>();
+
+                foreach (var filePath in files)
+                {
+                    var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                    var contentType = GetContentType(filePath);
+
+                    fileList.Add(new
+                    {
+                        fileName = Path.GetFileName(filePath),
+                        contentType = contentType,
+                        fileContent = Convert.ToBase64String(fileBytes) // Convert to Base64
+                    });
+                }
+
+                return Ok(new
+                {
+                    statusCode = 200,
+                    isSuccess = "true",
+                    message = "Photos fetched successfully.",
+                    data = fileList
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { statusCode = 500, isSuccess = "false", message = "An error occurred while processing the request.", data = new { error = ex.Message } });
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // Return the files or a specific file logic
+            if (files.Length > 0)
+            {
+                var filePath = files[0]; // Just returning the first file for simplicity
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var contentType = GetContentType(filePath); // Get the content type based on the file extension
+
+                return File(fileBytes, contentType); // Use dynamic content type
+            }
+
+            try
+            {
+                // Read the first file (or apply your custom logic for selecting a file)
+                var filePath = files[0];
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var contentType = GetContentType(filePath);
+
+                // Return the file as a base64-encoded string in the response
+                return Ok(new
+                {
+                    statusCode = 200,
+                    isSuccess = "true",
+                    message = "Photo fetched successfully.",
+                    data = new
+                    {
+                        fileName = Path.GetFileName(filePath),
+                        contentType = contentType,
+                        fileContent = Convert.ToBase64String(fileBytes)
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors gracefully
+                return Ok(new { statusCode = 500, isSuccess = "false", message = "An error occurred while processing the request.", data = new { error = ex.Message } });
+            }
+        }
+
+        // Helper method to determine the content type based on the file extension
+        private string GetContentType(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+            return extension switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".tiff" or ".tif" => "image/tiff",
+                ".svg" => "image/svg+xml",
+                ".webp" => "image/webp",
+                _ => "application/octet-stream" // Default type for unknown formats
+            };
         }
 
     }

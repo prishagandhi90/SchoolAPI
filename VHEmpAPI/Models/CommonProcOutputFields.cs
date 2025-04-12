@@ -649,5 +649,52 @@ namespace VHEmpAPI.Shared
             public string? UHID { get; set; }
         }
 
+        [Keyless]
+        public class EMPNotificationList
+        {
+            public Int64? Id { get; set; }
+            public string? AppName { get; set; }
+            public string? NotificationType { get; set; }
+            public string? MessageType { get; set; }
+            public string? Sender { get; set; }
+            public string? MessageTitle { get; set; }
+            public string? Message { get; set; }
+            public string? FileYN { get; set; }
+            public string? CreatedDate { get; set; }
+            public string? ScheduleDate { get; set; }
+            public string? InactiveDate { get; set; }
+            public string? SendToAll { get; set; }
+            public string? CreatedBy { get; set; }
+        }
+
+        [Keyless]
+        public class LoginId_FileIndex
+        {
+            public string? LoginId { get; set; }
+            public string? NotificationId { get; set; }
+            public Int32? Index { get; set; }
+        }
+
+        [Keyless]
+        public class LoginId__AdmPatients_Days_Tag
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public Int32? Days { get; set; }
+            public string? Tag { get; set; }
+            public string? FromDate { get; set; }
+            public string? ToDate { get; set; }
+        }
+
+        public class IssueReportDto
+        {
+            public string? ScreenName { get; set; }
+            public string? ErrorMessage { get; set; }
+            public string? LoginID { get; set; }
+            public string? TokenNo { get; set; }
+            public string? EmpID { get; set; }
+            public string? DeviceInfo { get; set; }
+        }
+
     }
 }

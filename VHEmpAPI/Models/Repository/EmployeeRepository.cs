@@ -765,6 +765,21 @@ namespace VHEmpAPI.Models.Repository
             return new DataSet();
         }
 
-    }
+        public async Task<IEnumerable<EMPNotificationList>> GetEMPNotificationsList(string loginId, string EmpId, int? days, string? tag, string? fromDate, string? toDate)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EMPApp_GetEMPNotificationsList @p_LoginId = '" + loginId + "', @p_EmpId = '" + EmpId + "', " +
+                                "@p_Days = "+ days +", @p_Tag = '"+ tag + "', @p_FromDate = '" + fromDate + "', @p_ToDate = '" + toDate + "' ";
+                var EmpNotificationList = await AppDbContextAdm.EMPNotifyList.FromSqlRaw(sqlStr).ToListAsync();
+                return EmpNotificationList;
+            }
+            catch (Exception ex)
+            {
 
+            }
+            return (IEnumerable<EMPNotificationList>)Enumerable.Empty<string>();
+        }
+
+    }
 }
