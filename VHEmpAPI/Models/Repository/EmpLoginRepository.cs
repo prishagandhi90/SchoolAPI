@@ -250,9 +250,10 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
+                string safeErrorMessage = issue.ErrorMessage.Replace("'", "''");
                 string sql = $"EXEC dbo.EmpApp_ReportIssue " +
                              $"@p_ScreenName = '{issue.ScreenName}', " +
-                             $"@p_ErrorMessage = '{issue.ErrorMessage}', " +
+                             $"@p_ErrorMessage = '{safeErrorMessage}', " +
                              $"@p_LoginID = '{issue.LoginID}', " +
                              $"@p_TokenNo = '{issue.TokenNo}', " +
                              $"@p_EmpID = '{issue.EmpID}', " +
