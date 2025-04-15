@@ -781,5 +781,20 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<EMPNotificationList>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<IsValidData>> UpdateNotification_Read(string loginId, string NotificationId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EMPApp_UpdateNotification_Read @p_LoginId = '" + loginId + "', @p_NotificationId = '" + NotificationId + "' ";
+                var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+                return EmpNotificationList;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
+        }
+
     }
 }

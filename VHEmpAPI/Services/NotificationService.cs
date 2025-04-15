@@ -61,10 +61,12 @@ public class NotificationService : BackgroundService
     {
         using (var connection = new SqlConnection(_connectionString))
         {
-            var newPatients = await connection.QueryAsync<EmpNotification>("select bd.Id, b.MessageTitle, b.Message, l.FirebaseId as DeviceToken, bd.SentDate, b.InactiveDate " +
-                                                                          "from NotificationDetail bd, NotificationMaster b, LoginMobile l " +
-                                                                          "where l.LoginId = bd.LoginId and AppName = 'Emp' " +
-                                                                          "and bd.MessageId = b.Id and bd.Status = 'Pending'");
+            //var newPatients = await connection.QueryAsync<EmpNotification>("select bd.Id, b.MessageTitle, b.Message, l.FirebaseId as DeviceToken, bd.SentDate, b.InactiveDate " +
+            //                                                              "from NotificationDetail bd, NotificationMaster b, LoginMobile l " +
+            //                                                              "where l.LoginId = bd.LoginId and AppName = 'Emp' " +
+            //                                                              "and bd.MessageId = b.Id and bd.Status = 'Pending'");
+            var queryString = await connection.ExecuteScalarAsync<string>("SELECT dbo.GetUnreadNotifications_Str('GetData_Str', 0)");
+            var newPatients = await connection.QueryAsync<EmpNotification>(queryString);
 
             foreach (var patient in newPatients)
             {
@@ -73,15 +75,19 @@ public class NotificationService : BackgroundService
                     //var doctorDeviceToken = GetDoctorDeviceToken(patient.DoctorId);
 
                     //await _firebaseService.SendNotificationAsync("New Patient Admitted", $"Patient: {patient.PatientName}", doctorDeviceToken);
-                    var response = await _firebaseService.SendNotificationAsync(patient.MessageTitle, $"Dr: {patient.Message}", patient.DeviceToken);
+                    var response = await _firebaseService.SendNotificationAsync(patient.MessageTitle, patient.Message, patient.DeviceToken);
 
                     if (!string.IsNullOrEmpty(response))
                     {
                         // Update the notification status in the database
                         //await connection.ExecuteAsync("UPDATE NotificationDetail SET SentDate = Getdate(), status = 'Sent' WHERE Id = @Id", new { patient.Id });
-                        await connection.ExecuteAsync("UPDATE bd SET SentDate = Getdate(), status = 'Sent' " +
-                                                      "from NotificationDetail bd, NotificationMaster b " +
-                                                      "WHERE bd.MessageId = b.Id and b.AppName = 'Emp' and bd.Id = @Id", new { patient.Id });
+
+                        //await connection.ExecuteAsync("UPDATE bd SET SentDate = Getdate(), status = 'Sent' " +
+                        //                              "from NotificationDetail bd, NotificationMaster b " +
+                        //                              "WHERE bd.MessageId = b.Id and b.AppName = 'Emp' and bd.Id = @Id", new { patient.Id });
+
+                        var updStr = await connection.ExecuteScalarAsync<string>($"SELECT dbo.GetUnreadNotifications_Str('UpdData_Str', {patient.Id})");
+                        await connection.ExecuteAsync(updStr);
                     }
                     else
                     {
@@ -113,7 +119,7 @@ public class PatientNotification
 
 public class EmpNotification
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     //public int DoctorId { get; set; }
     public string MessageTitle { get; set; }
     public string Message { get; set; }

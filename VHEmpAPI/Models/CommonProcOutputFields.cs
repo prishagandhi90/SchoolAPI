@@ -103,6 +103,7 @@ namespace VHEmpAPI.Shared
             public string? Emp_Type { get; set; }
             public string? IsSuperAdmin { get; set; }
             public string? IsPharmacyUser { get; set; }
+            public int? NotificationCount { get; set; }
         }
 
         [Keyless]
@@ -665,6 +666,7 @@ namespace VHEmpAPI.Shared
             public string? InactiveDate { get; set; }
             public string? SendToAll { get; set; }
             public string? CreatedBy { get; set; }
+            public string? BoldYN { get; set; }
         }
 
         [Keyless]
