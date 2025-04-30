@@ -31,7 +31,8 @@ namespace VHEmpAPI.Controllers
             this.employeeRepository = employeeRepository;
             this.jwtAuth = jwtAuth;
             _configuration = configuration;
-            _basePath = _configuration["FileUploadSettings:BasePath"] ?? @"C:\inetpub\wwwroot";
+            //_basePath = _configuration["FileUploadSettings:BasePath"] ?? @"C:\inetpub\wwwroot";
+            _basePath = @"\\192.168.1.36\vh_data\DrPaymentReports";
         }
 
         [HttpPost("authentication")]

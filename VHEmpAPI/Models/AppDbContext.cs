@@ -109,6 +109,9 @@ namespace VHEmpAPI.Models
         [NotMapped]
         public DbSet<EMPNotificationList> EMPNotifyList { get; set; }
 
+        [NotMapped]
+        public DbSet<ForceUpdateYN> ForceUpdateYN { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

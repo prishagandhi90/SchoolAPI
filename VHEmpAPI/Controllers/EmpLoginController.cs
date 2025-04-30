@@ -271,5 +271,26 @@ namespace VHEmpAPI.Controllers
             {
             }
         }
+
+        [HttpPost("ForceUpdateYN")]
+        public async Task<ActionResult<ForceUpdateYN>> ForceUpdateYN()
+        {
+            try
+            {
+                var result = await empLoginRepository.ForceUpdateYN();
+                if (result == null)
+                    return NotFound();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+
+            }
+        }
     }
 }

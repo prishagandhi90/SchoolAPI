@@ -424,6 +424,7 @@ namespace VHEmpAPI.Shared
             public string? dte { get; set; }
             public string? Intercom { get; set; }
             public string? Org { get; set; }
+            public string? FromEmergency { get; set; }
         }
 
         [Keyless]
@@ -696,6 +697,13 @@ namespace VHEmpAPI.Shared
             public string? TokenNo { get; set; }
             public string? EmpID { get; set; }
             public string? DeviceInfo { get; set; }
+        }
+
+        [Keyless]
+        public class ForceUpdateYN
+        {
+            public string? VersionName { get; set; }
+            public string? ForceUpdYN { get; set; }
         }
 
     }

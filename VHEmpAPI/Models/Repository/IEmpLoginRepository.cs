@@ -11,5 +11,6 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> GetLoginUserNames(string LoginId);
         Task<IEnumerable<CommonProcOutputFields.Resp_LoginAs_Creds>> GetLoginAsUserCreds(string AdminMobileNo, string UserNm);
         Task<bool> ReportIssueAsync(IssueReportDto issue);
+        Task<IEnumerable<ForceUpdateYN>> ForceUpdateYN();
     }
 }

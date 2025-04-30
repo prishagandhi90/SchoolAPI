@@ -268,5 +268,20 @@ namespace VHEmpAPI.Models.Repository
                 return false;
             }
         }
+
+        public async Task<IEnumerable<ForceUpdateYN>> ForceUpdateYN()
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_ForceUpdateYN";
+                var IsValidNo = await AppDbContextAdm.ForceUpdateYN.FromSqlRaw(sqlStr).ToListAsync();
+                return IsValidNo;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<ForceUpdateYN>)Enumerable.Empty<string>();
+        }
     }
 }
