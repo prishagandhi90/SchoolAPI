@@ -25,14 +25,16 @@ namespace VHEmpAPI.Controllers
         //private readonly string _basePath = @"C:\inetpub\wwwroot\VHMobileAPI\Uploads";
         //private readonly string _basePath = @"C:\inetpub\wwwroot\VHTestEmpAPI\Uploads";
         private readonly string _basePath;
+        private readonly IWebHostEnvironment _env;
 
-        public EmployeeController(IEmployeeRepository employeeRepository, IJwtAuth jwtAuth, IConfiguration configuration)
+        public EmployeeController(IEmployeeRepository employeeRepository, IJwtAuth jwtAuth, IConfiguration configuration, IWebHostEnvironment env)
         {
             this.employeeRepository = employeeRepository;
             this.jwtAuth = jwtAuth;
             _configuration = configuration;
-            //_basePath = _configuration["FileUploadSettings:BasePath"] ?? @"C:\inetpub\wwwroot";
-            _basePath = @"\\192.168.1.36\vh_data\DrPaymentReports";
+            _basePath = _configuration["FileUploadSettings:BasePath"] ?? @"C:\inetpub\wwwroot";
+            //_basePath = @"\\192.168.1.36\vh_data\CustomNotification";
+            _env = env;
         }
 
         [HttpPost("authentication")]
@@ -2049,37 +2051,97 @@ namespace VHEmpAPI.Controllers
                 }
             }
 
-            //string doctorFolder = Path.Combine(_basePath, "541".ToString());
-            string doctorFolder = Path.Combine(_basePath, loginIdNum.NotificationId.ToString());
+            #region Working code to scan files
 
-            if (!Directory.Exists(doctorFolder))
-            {
-                return Ok(new { statusCode = 404, isSuccess = "false", message = "No folder found for this doctor.", data = new { } });
-            }
-
-            // Asynchronously get files from the directory
-            var files = await Task.Run(() => Directory.GetFiles(doctorFolder));
-            if (files.Length == 0)
-            {
-                return Ok(new { statusCode = 404, isSuccess = "false", message = "No photo found for this doctor.", data = new { } });
-            }
+            ////string doctorFolder = Path.Combine(_basePath, "541".ToString());
+            ////string doctorFolder = Path.Combine(_basePath, loginIdNum.NotificationId.ToString());
+            //string doctorFolder = Path.Combine(_basePath, loginIdNum.NotificationId.ToString());
 
 
+            //if (!Directory.Exists(doctorFolder))
+            //{
+            //    return Ok(new { statusCode = 404, isSuccess = "false", message = System.Security.Principal.WindowsIdentity.GetCurrent().Name.ToString(),
+            //        data = new { } });
+            //}
+
+            //// Asynchronously get files from the directory
+            //var files = await Task.Run(() => Directory.GetFiles(doctorFolder));
+            //if (files.Length == 0)
+            //{
+            //    return Ok(new { statusCode = 404, isSuccess = "false", message = "No photo found for this doctor.", data = new { } });
+            //}
+
+            //try
+            //{
+            //    // List to store multiple files
+            //    var fileList = new List<object>();
+
+            //    foreach (var filePath in files)
+            //    {
+            //        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            //        var contentType = GetContentType(filePath);
+
+            //        fileList.Add(new
+            //        {
+            //            fileName = Path.GetFileName(filePath),
+            //            contentType = contentType,
+            //            fileContent = Convert.ToBase64String(fileBytes) // Convert to Base64
+            //        });
+            //    }
+
+            //    return Ok(new
+            //    {
+            //        statusCode = 200,
+            //        isSuccess = "true",
+            //        message = "Photos fetched successfully.",
+            //        data = fileList
+            //    });
+            //}
+            //catch (Exception ex)
+            //{
+            //    return Ok(new { statusCode = 500, isSuccess = "false", message = "An error occurred while processing the request.", data = new { error = ex.Message } });
+            //}
 
 
 
 
-
-
-
+            #endregion
 
 
             try
             {
-                // List to store multiple files
+                if (!Directory.Exists(_basePath))
+                {
+                    return Ok(new
+                    {
+                        statusCode = 404,
+                        isSuccess = "false",
+                        message = "Base path does not exist. Identity: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name.ToString(),
+                        data = new { }
+                    });
+                }
+
+                // Get all files in the base path directory
+                var allFiles = await Task.Run(() => Directory.GetFiles(_basePath));
+
+                // Filter files starting with NotificationId_
+                string prefix = $"{loginIdNum.NotificationId}_";
+                var matchingFiles = allFiles.Where(f => Path.GetFileName(f).StartsWith(prefix)).ToList();
+
+                if (matchingFiles.Count == 0)
+                {
+                    return Ok(new
+                    {
+                        statusCode = 404,
+                        isSuccess = "false",
+                        message = $"No files found starting with '{prefix}'.",
+                        data = new { }
+                    });
+                }
+
                 var fileList = new List<object>();
 
-                foreach (var filePath in files)
+                foreach (var filePath in matchingFiles)
                 {
                     var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
                     var contentType = GetContentType(filePath);
@@ -2088,7 +2150,7 @@ namespace VHEmpAPI.Controllers
                     {
                         fileName = Path.GetFileName(filePath),
                         contentType = contentType,
-                        fileContent = Convert.ToBase64String(fileBytes) // Convert to Base64
+                        fileContent = Convert.ToBase64String(fileBytes)
                     });
                 }
 
@@ -2102,59 +2164,57 @@ namespace VHEmpAPI.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(new { statusCode = 500, isSuccess = "false", message = "An error occurred while processing the request.", data = new { error = ex.Message } });
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // Return the files or a specific file logic
-            if (files.Length > 0)
-            {
-                var filePath = files[0]; // Just returning the first file for simplicity
-                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                var contentType = GetContentType(filePath); // Get the content type based on the file extension
-
-                return File(fileBytes, contentType); // Use dynamic content type
-            }
-
-            try
-            {
-                // Read the first file (or apply your custom logic for selecting a file)
-                var filePath = files[0];
-                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                var contentType = GetContentType(filePath);
-
-                // Return the file as a base64-encoded string in the response
                 return Ok(new
                 {
-                    statusCode = 200,
-                    isSuccess = "true",
-                    message = "Photo fetched successfully.",
-                    data = new
-                    {
-                        fileName = Path.GetFileName(filePath),
-                        contentType = contentType,
-                        fileContent = Convert.ToBase64String(fileBytes)
-                    }
+                    statusCode = 500,
+                    isSuccess = "false",
+                    message = "An error occurred while processing the request.",
+                    data = new { error = ex.Message }
                 });
             }
-            catch (Exception ex)
-            {
-                // Handle unexpected errors gracefully
-                return Ok(new { statusCode = 500, isSuccess = "false", message = "An error occurred while processing the request.", data = new { error = ex.Message } });
-            }
+
+
+            #region Old code may not work
+
+
+            //// Return the files or a specific file logic
+            //if (files.Length > 0)
+            //{
+            //    var filePath = files[0]; // Just returning the first file for simplicity
+            //    var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            //    var contentType = GetContentType(filePath); // Get the content type based on the file extension
+
+            //    return File(fileBytes, contentType); // Use dynamic content type
+            //}
+
+            //try
+            //{
+            //    // Read the first file (or apply your custom logic for selecting a file)
+            //    var filePath = files[0];
+            //    var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            //    var contentType = GetContentType(filePath);
+
+            //    // Return the file as a base64-encoded string in the response
+            //    return Ok(new
+            //    {
+            //        statusCode = 200,
+            //        isSuccess = "true",
+            //        message = "Photo fetched successfully.",
+            //        data = new
+            //        {
+            //            fileName = Path.GetFileName(filePath),
+            //            contentType = contentType,
+            //            fileContent = Convert.ToBase64String(fileBytes)
+            //        }
+            //    });
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Handle unexpected errors gracefully
+            //    return Ok(new { statusCode = 500, isSuccess = "false", message = "An error occurred while processing the request.", data = new { error = ex.Message } });
+            //}
+
+            #endregion
         }
 
         // Helper method to determine the content type based on the file extension
