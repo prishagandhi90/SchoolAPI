@@ -796,5 +796,23 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<IsValidData>> Save_DoctorVoiceNote(VoiceNoteFields voiceNoteFields)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_Save_DoctorVoiceNote @p_UHID = '"+ voiceNoteFields.UHID + "', @p_IpdNo = '"+ voiceNoteFields.IPDNo +"', " +
+                                "@p_PatientName = '"+ voiceNoteFields.PatientName + "', @p_VoiceFileName = '"+ voiceNoteFields.VoiceFileName +"', " +
+                                "@p_DoctorName = '"+ voiceNoteFields.DoctorName +"', @p_LoginId = '" + voiceNoteFields.LoginId + "', " +
+                                "@p_CreatedUser = '" + voiceNoteFields.EmpID + "', @p_TranslatedText = '"+ voiceNoteFields.TranslatedText +"' ";
+                var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+                return EmpNotificationList;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
+        }
+
     }
 }

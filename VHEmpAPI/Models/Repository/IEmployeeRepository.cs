@@ -54,6 +54,7 @@ namespace VHEmpAPI.Models.Repository
         Task<DataSet> GetPatientSummaryLabData(string DrId, string IpdNo, string UHID);
         Task<IEnumerable<EMPNotificationList>> GetEMPNotificationsList(string loginId, string EmpId, int? days, string? tag, string? fromDate, string? toDate);
         Task<IEnumerable<IsValidData>> UpdateNotification_Read(string loginId, string NotificationId);
+        Task<IEnumerable<IsValidData>> Save_DoctorVoiceNote(VoiceNoteFields voiceNoteFields);
 
     }
 }

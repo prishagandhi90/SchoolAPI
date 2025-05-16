@@ -706,5 +706,19 @@ namespace VHEmpAPI.Shared
             public string? ForceUpdYN { get; set; }
         }
 
+        [Keyless]
+        public class VoiceNoteFields
+        {
+            public string? LoginId { get; set; }
+            public string? EmpID { get; set; }
+            public string? UHID { get; set; }
+            public string? IPDNo { get; set; }
+            public string? PatientName { get; set; }
+            public string? VoiceFileName { get; set; }
+            public string? DoctorName { get; set; }
+            public string? CreatedUser { get; set; }
+            public string? TranslatedText { get; set; }
+        }
+
     }
 }

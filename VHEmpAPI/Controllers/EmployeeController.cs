@@ -25,6 +25,7 @@ namespace VHEmpAPI.Controllers
         //private readonly string _basePath = @"C:\inetpub\wwwroot\VHMobileAPI\Uploads";
         //private readonly string _basePath = @"C:\inetpub\wwwroot\VHTestEmpAPI\Uploads";
         private readonly string _basePath;
+        private readonly string _voicePath;
         private readonly IWebHostEnvironment _env;
 
         public EmployeeController(IEmployeeRepository employeeRepository, IJwtAuth jwtAuth, IConfiguration configuration, IWebHostEnvironment env)
@@ -34,8 +35,85 @@ namespace VHEmpAPI.Controllers
             _configuration = configuration;
             _basePath = _configuration["FileUploadSettings:BasePath"] ?? @"C:\inetpub\wwwroot";
             //_basePath = @"\\192.168.1.36\vh_data\CustomNotification";
+            _voicePath = _configuration["FileUploadSettings:VoicePath"] ?? @"C:\inetpub\wwwroot";
             _env = env;
         }
+
+        [HttpPost("UploadPatientVoiceNote")]
+        //public async Task<IActionResult> UploadPatientVoiceNote([FromForm] VoiceNoteFields voiceNoteFields, IFormFile voiceFile)
+        public async Task<IActionResult> UploadPatientVoiceNote([FromForm] VoiceNoteFields voiceNoteFields, [FromForm] IFormFile voiceFile)
+        {
+            if (voiceFile == null || voiceFile.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            if (String.IsNullOrEmpty(voiceNoteFields?.IPDNo))
+                return BadRequest("IPDNo is compulsory.");
+
+            if (String.IsNullOrEmpty(voiceNoteFields?.UHID))
+                return BadRequest("UHID is compulsory.");
+
+            string IPDNo = voiceNoteFields?.IPDNo.Replace("/", "_");
+            string UHID = voiceNoteFields?.UHID.Replace("/", "_");
+
+            // Optional: validate file type
+            string[] allowedExtensions = { ".mp3", ".wav", ".m4a" };
+            string extension = Path.GetExtension(voiceFile.FileName).ToLower();
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Invalid file type.");
+            }
+
+            string abc = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+
+            // Create patient-specific folder
+            string PatientFolder = Path.Combine(_voicePath, IPDNo);
+            //PatientFolder = _voicePath;
+            if (!Directory.Exists(PatientFolder))
+            {
+                Directory.CreateDirectory(PatientFolder);
+            }
+            else
+            {
+                //// Delete all existing files in the folder
+                //var files = Directory.GetFiles(PatientFolder);
+                //foreach (var existingFile in files)
+                //{
+                //    System.IO.File.Delete(existingFile);
+                //}
+            }
+
+            // Generate unique file name
+            string fileName = $"{Path.GetFileName(voiceFile.FileName)}";
+            voiceNoteFields.VoiceFileName = fileName;
+            string filePath = Path.Combine(PatientFolder, fileName);
+
+            // Save file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await voiceFile.CopyToAsync(stream);
+            }
+
+            var IsValidMobile = await employeeRepository.Save_DoctorVoiceNote(voiceNoteFields);
+
+            string IsValid = "";
+            if (IsValidMobile != null && IsValidMobile.Count() > 0)
+            {
+                IsValid = IsValidMobile.Select(x => x.IsValid).ToList()[0].ToString();
+
+                if (IsValid.ToUpper() != "TRUE")
+                {
+                    return Ok(new { statusCode = Ok(IsValidMobile).StatusCode, isSuccess = "false", message = "Invalid", data = new { } });
+                }
+
+                else if (IsValid.ToUpper() == "TRUE")
+                {
+                    return Ok(new { statusCode = Ok(IsValid).StatusCode, isSuccess = "true", message = "Successful", data = new { } });
+                }
+            }
+
+            return Ok(new { Path = filePath });
+        }
+
 
         [HttpPost("authentication")]
         public async Task<ActionResult<dynamic>> Authentication([FromBody] MobileCreds mobileCreds)
@@ -2106,7 +2184,6 @@ namespace VHEmpAPI.Controllers
 
 
             #endregion
-
 
             try
             {
