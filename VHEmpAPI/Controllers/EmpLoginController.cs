@@ -25,6 +25,8 @@ namespace VHEmpAPI.Controllers
             this.jwtAuth = jwtAuth;
         }
 
+        #region Validate Mobile including Send OTP
+
         [HttpPost("ValidateMobileNo")]
         public async Task<ActionResult<IsValidData>> ValidateMobileNo([FromBody] MobileNum mobileNum)
         {
@@ -152,6 +154,10 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        #endregion
+
+        #region New Password Geenration and Get Login Users
+
         [HttpPost("GenerateNewPassword")]
         public async Task<ActionResult<dynamic>> GenerateNewPassword([FromBody] MobileCreds mobileCreds)
         {
@@ -242,6 +248,10 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        #endregion
+
+        #region Log Mobile App issues to Database
+
         [HttpPost("PostIssue")]
         //[Authorize]
         public async Task<IActionResult> PostIssue([FromBody] IssueReportDto issue)
@@ -272,6 +282,10 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        #endregion
+
+        #region Force Update App
+
         [HttpPost("ForceUpdateYN")]
         public async Task<ActionResult<ForceUpdateYN>> ForceUpdateYN()
         {
@@ -292,5 +306,8 @@ namespace VHEmpAPI.Controllers
 
             }
         }
+
+        #endregion
+
     }
 }

@@ -16,6 +16,8 @@ namespace VHEmpAPI.Models.Repository
             AppDbContextAdm = appDbContext;
         }
 
+        #region Validate Mobileno and OTP related
+
         public async Task<IEnumerable<CommonProcOutputFields.IsValidData>> ValidateMobileNo(string MobileNo)
         {
             try
@@ -216,6 +218,10 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region Get Login Users and Validate their Credentials
+
         public async Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> GetLoginUserNames(string LoginId)
         {
             try
@@ -247,6 +253,10 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_LoginAs_Creds>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region Log Issues
+
         public async Task<bool> ReportIssueAsync(IssueReportDto issue)
         {
             try
@@ -270,6 +280,10 @@ namespace VHEmpAPI.Models.Repository
             }
         }
 
+        #endregion
+
+        #region Force Update Provision
+
         public async Task<IEnumerable<ForceUpdateYN>> ForceUpdateYN()
         {
             try
@@ -284,5 +298,8 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<ForceUpdateYN>)Enumerable.Empty<string>();
         }
+
+        #endregion
+
     }
 }
