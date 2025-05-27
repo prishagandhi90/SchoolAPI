@@ -1,4 +1,6 @@
-﻿namespace VHMobileAPI.Models
+﻿using System.Text;
+
+namespace VHMobileAPI.Models
 {
     public class EncodeDecode
     {
@@ -16,6 +18,7 @@
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
+
         //this function Convert to Decord your Password
         public static string DecodeFrom64(string encodedData)
         {
@@ -27,6 +30,17 @@
             utf8Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
             string result = new String(decoded_char);
             return result;
+        }
+
+        public static string WebPass_Encode(string input, System.Text.Encoding encoding)
+        {
+            Byte[] stringbytes = encoding.GetBytes(input);
+            StringBuilder sbbytes = new StringBuilder(stringbytes.Length * 2);
+            foreach (byte b in stringbytes)
+            {
+                sbbytes.AppendFormat("{0:X2}", b);
+            }
+            return sbbytes.ToString();
         }
     }
 }

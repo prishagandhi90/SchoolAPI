@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -17,11 +18,13 @@ namespace VHEmpAPI.Models.Repository
         public AppDbContext AppDbContextAdm { get; }
         private readonly IDBMethods _dbMethods;
         private IDbContextTransaction _transaction;
+        private readonly IConfiguration _configuration;
 
-        public EmployeeRepository(AppDbContext appDbContext, IDBMethods dbm)
+        public EmployeeRepository(AppDbContext appDbContext, IDBMethods dbm, IConfiguration configuration)
         {
             AppDbContextAdm = appDbContext;
             _dbMethods = dbm ?? throw new ArgumentNullException(nameof(dbm));
+            _configuration = configuration;
         }
 
         public async Task<IDbContextTransaction> BeginTransaction()
@@ -79,6 +82,8 @@ namespace VHEmpAPI.Models.Repository
                 throw new InvalidOperationException("Error disposing transaction: " + ex.Message);
             }
         }
+
+        #region Login Authentication and Auto Login
 
         public async Task<IEnumerable<CommonProcOutputFields.TokenData>> ValidateMobile_Pass(MobileCreds mobileCreds)
         {
@@ -157,6 +162,13 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<DashBoardList>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region Payroll Module
+
+
+        #region Attendance Summary and Detail and Mispunch logic
+
         public async Task<IEnumerable<CommonProcOutputFields.Ddl_Value_Nm>> GetMonthYr_EmpInfo()
         {
             try
@@ -221,6 +233,9 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_AttSumm_EmpInfo>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region Emp Summary Dashboard
         public async Task<IEnumerable<CommonProcOutputFields.ret_EmpSummary_Dashboard>> GetEmpSummary_Dashboard(string EmpId, LoginIdNum loginIdNum)
         {
             try
@@ -237,6 +252,9 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<ret_EmpSummary_Dashboard>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region Leave and Overtime Entries
         public async Task<IEnumerable<CommonProcOutputFields.OutSingleString>> GetLeaveDays(string EmpId, GetLeaveDays getLeaveDays)
         {
             try
@@ -384,6 +402,9 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region Duty Schedule
         public async Task<IEnumerable<CommonProcOutputFields.Resp_value_name>> EmpApp_GetShiftWeekList(string EmpId, string LoginId)
         {
             try
@@ -430,6 +451,95 @@ namespace VHEmpAPI.Models.Repository
             return new DataTable();
         }
 
+        #endregion
+
+        #region LV/OT Approval System
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesList>> EmpApp_Get_LV_OT_RolesList(string EmpId, string LoginId, string RoleNm, string Flag)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_Get_LV_OT_Roles @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
+                                "@p_Role = '" + RoleNm + "', @p_Flag = '" + Flag + "' ";
+                var Lv_Ot_Roles_Lst = await AppDbContextAdm.Resp_LV_OT_RolesList.FromSqlRaw(sqlStr).ToListAsync();
+                return Lv_Ot_Roles_Lst;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_LV_OT_RolesList>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesRights>> EmpApp_Get_LV_OT_Role_Rights(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_Get_LV_OT_Role_Rights @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "' ";
+                var Lv_Ot_Roles_Lst = await AppDbContextAdm.Resp_LV_OT_RolesRights.FromSqlRaw(sqlStr).ToListAsync();
+                return Lv_Ot_Roles_Lst;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_LV_OT_RolesRights>)Enumerable.Empty<string>();
+        }
+
+        //public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry, IDbContextTransaction transaction)
+        public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_upd_leave_detail @p_LoginId = '" + upd_Lv_OT_entry.LoginId + "', @p_EmpId = '" + EmpId + "', " +
+                                "@p_Flag = '" + upd_Lv_OT_entry.Flag + "', @p_leavedetailid = '" + upd_Lv_OT_entry.LeaveDetailId + "', " +
+                                "@p_action = '" + upd_Lv_OT_entry.Action + "', @p_reason = '" + upd_Lv_OT_entry.Reason + "', " +
+                                "@p_usr_nm = '" + upd_Lv_OT_entry.UserName + "', @p_note = '" + upd_Lv_OT_entry.Note + "' ";
+
+
+                var savedYN = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
+                //var savedYN = await AppDbContextAdm.Database.ExecuteSqlRawAsync(sqlStr, transaction.GetDbTransaction());
+                return new List<CommonProcOutputFields.SavedYesNo>
+                {
+                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" }
+                };
+                //return DashboardData;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message); // You can log this or save it in DB
+
+                return new List<CommonProcOutputFields.SavedYesNo>
+                {
+                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Error: " + ex.Message }
+                };
+            }
+            return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetLeaveRejectReason @p_EmpId = '" + EmpId + "', " +
+                                "@p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
+        }
+
+        #endregion
+
+
+        #endregion
+
+        #region Pharmacy Module
+
+        #region Prescription Viewer & Prescription Medicines
         public async Task<IEnumerable<CommonProcOutputFields.Resp_Dr_PrecriptionViewer>> EmpApp_GetDrPrescriptionViewer(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds)
         {
             try
@@ -530,6 +640,11 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Beds>)Enumerable.Empty<string>();
         }
 
+
+        #endregion
+
+        #endregion
+
         public async Task<IEnumerable<DoctorNotification>> GetDrNotifications(string loginId, string EmpId)
         {
             try
@@ -545,83 +660,7 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<DoctorNotification>)Enumerable.Empty<string>();
         }
 
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesList>> EmpApp_Get_LV_OT_RolesList(string EmpId, string LoginId, string RoleNm, string Flag)
-        {
-            try
-            {
-                string sqlStr = "exec dbo.EmpApp_Get_LV_OT_Roles @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
-                                "@p_Role = '" + RoleNm + "', @p_Flag = '" + Flag + "' ";
-                var Lv_Ot_Roles_Lst = await AppDbContextAdm.Resp_LV_OT_RolesList.FromSqlRaw(sqlStr).ToListAsync();
-                return Lv_Ot_Roles_Lst;
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return (IEnumerable<Resp_LV_OT_RolesList>)Enumerable.Empty<string>();
-        }
-
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_LV_OT_RolesRights>> EmpApp_Get_LV_OT_Role_Rights(string EmpId, string LoginId)
-        {
-            try
-            {
-                string sqlStr = "exec dbo.EmpApp_Get_LV_OT_Role_Rights @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "' ";
-                var Lv_Ot_Roles_Lst = await AppDbContextAdm.Resp_LV_OT_RolesRights.FromSqlRaw(sqlStr).ToListAsync();
-                return Lv_Ot_Roles_Lst;
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return (IEnumerable<Resp_LV_OT_RolesRights>)Enumerable.Empty<string>();
-        }
-
-        //public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry, IDbContextTransaction transaction)
-        public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> EmpApp_Upd_LV_OT_Entry(string EmpId, Upd_Lv_OT_entry upd_Lv_OT_entry)
-        {
-            try
-            {
-                string sqlStr = "exec dbo.EmpApp_upd_leave_detail @p_LoginId = '" + upd_Lv_OT_entry.LoginId + "', @p_EmpId = '" + EmpId + "', " +
-                                "@p_Flag = '" + upd_Lv_OT_entry.Flag + "', @p_leavedetailid = '" + upd_Lv_OT_entry.LeaveDetailId + "', " +
-                                "@p_action = '" + upd_Lv_OT_entry.Action + "', @p_reason = '" + upd_Lv_OT_entry.Reason + "', " +
-                                "@p_usr_nm = '" + upd_Lv_OT_entry.UserName + "', @p_note = '" + upd_Lv_OT_entry.Note + "' ";
-
-
-                var savedYN = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
-                //var savedYN = await AppDbContextAdm.Database.ExecuteSqlRawAsync(sqlStr, transaction.GetDbTransaction());
-                return new List<CommonProcOutputFields.SavedYesNo>
-                {
-                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" }
-                };
-                //return DashboardData;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message); // You can log this or save it in DB
-
-                return new List<CommonProcOutputFields.SavedYesNo>
-                {
-                    new CommonProcOutputFields.SavedYesNo { SavedYN = "Error: " + ex.Message }
-                };
-            }
-            return (IEnumerable<SavedYesNo>)Enumerable.Empty<string>();
-        }
-
-        public async Task<IEnumerable<CommonProcOutputFields.Resp_name>> GetLeaveRejectReason(string EmpId, string LoginId)
-        {
-            try
-            {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveRejectReason @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
-                return DashboardData;
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
-        }
+        #region Module & Screen Rights
 
         public async Task<IEnumerable<CommonProcOutputFields.ModuleScreenRights>> GetModuleRights(string EmpId, string LoginId, string ModuleName)
         {
@@ -655,6 +694,12 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<ModuleScreenRights>)Enumerable.Empty<string>();
         }
 
+        #endregion
+
+        #region IPD Module
+
+
+        #region Admitted Patients List
         public async Task<IEnumerable<CommonProcOutputFields.Organizations>> GetOrganizations(string EmpId, string LoginId)
         {
             try
@@ -706,6 +751,10 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<PatientList>)Enumerable.Empty<string>();
         }
+
+        #endregion
+
+        #region Patient Lab reports & Lab Summary
 
         public async Task<DataSet> GetPatientLabReports(string DrId, string IpdNo, string UHID)
         {
@@ -765,12 +814,225 @@ namespace VHEmpAPI.Models.Repository
             return new DataSet();
         }
 
+        #endregion
+
+        #region Investigation Requisition
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> EmpApp_GetExternalLabName(string EmpId, string LoginId)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_GetExternalLabNm @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_id_name>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_name>> EmpApp_InvReq_GetServiceGrp(string EmpId, string LoginId, string SearchText)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_InvReq_GetServiceGrp @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '"+ SearchText +"' ";
+                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_name>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_txt_name_value>> EmpApp_InvReq_SearchService(string EmpId, string LoginId, string SearchText)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_InvReq_SearchService @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_txt_name_val.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_txt_name_value>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_id_int_name>> EmpApp_InvReq_SearchDrName(string EmpId, string LoginId, string SearchText, string Srv)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_InvReq_SearchDrName @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "', @p_Srv = '"+ Srv +"' ";
+                var DashboardData = await AppDbContextAdm.Resp_id_int_name.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_id_int_name>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_Get_Query>> EmpApp_InvReq_Get_Query(InvReq_Get_Query invReq_Get_Query)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_InvReq_Get_Query @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
+                                "@P_TYPE = '" + invReq_Get_Query.TYPE + "', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.IPD + "', " +
+                                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
+                                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_Qry.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_InvReq_Get_Query>)Enumerable.Empty<string>();
+        }
+
+        public async Task<RequestSheetIPD> SaveRequestSheetIPD_Dapper(RequestSheetIPD model)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("VHMobileDBConnection")))
+                {
+                    var dp = new DynamicParameters();
+                    dp.Add("@p_action", model.Action);
+                    dp.Add("@p_ipdno", model.IPDNo);
+                    dp.Add("@p_uhid", model.UHIDNo);
+                    dp.Add("@p_dt", model.Dt);
+                    dp.Add("@p_req_typ", model.ReqType);
+                    dp.Add("@p_rmk", model.Remark);
+                    dp.Add("@p_usr_nm", model.Username);
+                    dp.Add("@p_emerg", model.IsEmergency);
+                    dp.Add("@p_clinic_rmk", model.ClinicRemark);
+                    dp.Add("@p_inv_priority", model.InvestPriority);
+
+                    dp.Add("@o_idn", model.ReqId, DbType.Int32, ParameterDirection.InputOutput);
+                    dp.Add("@o_dr_inst_id", model.Dr_Inst_Id, DbType.Int32, ParameterDirection.InputOutput);
+                    dp.Add("@o_bill_detail_id", model.Bill_Detail_Id, DbType.Int32, ParameterDirection.InputOutput);
+
+                    await connection.ExecuteAsync("WEBPACEDATA2019.dbo.SaveRequestSheetIPD", dp, commandType: CommandType.StoredProcedure);
+
+                    model.ReqId = dp.Get<int>("@o_idn");
+                    model.Dr_Inst_Id = dp.Get<int>("@o_dr_inst_id");
+                    model.Bill_Detail_Id = dp.Get<int>("@o_bill_detail_id");
+
+                    return model;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while saving RequestSheetIPD: " + ex.Message);
+            }
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> SaveRequestSheetDetailsIPD_Dapper(List<RequestSheetDetailsIPD> list)
+        {
+            var response = new List<CommonProcOutputFields.SavedYesNo>();
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("VHMobileDBConnection")))
+                {
+                    foreach (var item in list.Where(x => x.RowState != DataRowState.Unchanged))
+                    {
+                        var dp = new DynamicParameters();
+                        dp.Add("@p_action", item.Action);
+                        dp.Add("@p_req_id", item.MReqId);
+                        dp.Add("@p_testname", item.ServiceName);
+                        dp.Add("@p_testcode", item.ServiceId);
+                        dp.Add("@p_reqby", item.Username);
+                        dp.Add("@p_req_typ", item.ReqTyp);
+                        dp.Add("@p_dr_inst_id", item.Dr_Inst_Id);
+                        dp.Add("@p_bill_detail_id", item.Bill_Detail_Id);
+                        dp.Add("@p_UHID", item.UHIDNo);
+                        dp.Add("@p_ipd", item.IPDNo);
+                        dp.Add("@p_RepDrId", item.DrID);
+                        dp.Add("@p_RepDrName", item.DrNAME);
+
+                        await connection.ExecuteAsync("WEBPACEDATA2019.dbo.SaveRequestSheetDetailsIPD", dp, commandType: CommandType.StoredProcedure);
+                    }
+
+                    response.Add(new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" });
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Add(new CommonProcOutputFields.SavedYesNo { SavedYN = "Error: " + ex.Message });
+            }
+
+            return response;
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_Get_HistData>> EmpApp_InvReq_Get_HIstoryData(InvReq_Get_Query invReq_Get_Query)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_InvReq_Get_HIstoryData @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
+                                "@P_TYPE = 'GET_INV_HIS_MASTER', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.Top10_40 + "', " +
+                                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
+                                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_HistData.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_InvReq_Get_HistData>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_SelReq_HistDetail>> EmpApp_InvReq_SelReq_HistoryDetail(InvReq_Get_Query invReq_Get_Query)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_InvReq_SelReq_HistoryDetail @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
+                                "@P_TYPE = 'GET_INV_HIS_DETAIL', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.Top10_40 + "', " +
+                                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
+                                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
+                var DashboardData = await AppDbContextAdm.Resp_InvReq_SelReq_HistDetail.FromSqlRaw(sqlStr).ToListAsync();
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_InvReq_SelReq_HistDetail>)Enumerable.Empty<string>();
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.RespWebCreds>> Validate_Web_Creds(WebEmpMobileCreds mobileCreds)
+        {
+            try
+            {
+                string sqlStr = "exec dbo.EmpApp_Validate_Web_Creds @p_LoginId = '" + mobileCreds.LoginId + "', @p_Mobile = '" + mobileCreds.MobileNo + "', @p_Password = '" + mobileCreds.Password + "' ";
+                var IsValidData = await AppDbContextAdm.RespWebCreds.FromSqlRaw(sqlStr).ToListAsync();
+                return IsValidData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<RespWebCreds>)Enumerable.Empty<string>();
+        }
+        
+        #endregion
+
+
+        #endregion
+
+        #region Notification Provision
+
         public async Task<IEnumerable<EMPNotificationList>> GetEMPNotificationsList(string loginId, string EmpId, int? days, string? tag, string? fromDate, string? toDate)
         {
             try
             {
                 string sqlStr = "exec dbo.EMPApp_GetEMPNotificationsList @p_LoginId = '" + loginId + "', @p_EmpId = '" + EmpId + "', " +
-                                "@p_Days = "+ days +", @p_Tag = '"+ tag + "', @p_FromDate = '" + fromDate + "', @p_ToDate = '" + toDate + "' ";
+                                "@p_Days = " + days + ", @p_Tag = '" + tag + "', @p_FromDate = '" + fromDate + "', @p_ToDate = '" + toDate + "' ";
                 var EmpNotificationList = await AppDbContextAdm.EMPNotifyList.FromSqlRaw(sqlStr).ToListAsync();
                 return EmpNotificationList;
             }
@@ -800,10 +1062,10 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_Save_DoctorVoiceNote @p_UHID = '"+ voiceNoteFields.UHID + "', @p_IpdNo = '"+ voiceNoteFields.IPDNo +"', " +
-                                "@p_PatientName = '"+ voiceNoteFields.PatientName + "', @p_VoiceFileName = '"+ voiceNoteFields.VoiceFileName +"', " +
-                                "@p_DoctorName = '"+ voiceNoteFields.DoctorName +"', @p_LoginId = '" + voiceNoteFields.LoginId + "', " +
-                                "@p_CreatedUser = '" + voiceNoteFields.EmpID + "', @p_TranslatedText = '"+ voiceNoteFields.TranslatedText +"' ";
+                string sqlStr = "exec dbo.EmpApp_Save_DoctorVoiceNote @p_UHID = '" + voiceNoteFields.UHID + "', @p_IpdNo = '" + voiceNoteFields.IPDNo + "', " +
+                                "@p_PatientName = '" + voiceNoteFields.PatientName + "', @p_VoiceFileName = '" + voiceNoteFields.VoiceFileName + "', " +
+                                "@p_DoctorName = '" + voiceNoteFields.DoctorName + "', @p_LoginId = '" + voiceNoteFields.LoginId + "', " +
+                                "@p_CreatedUser = '" + voiceNoteFields.EmpID + "', @p_TranslatedText = '" + voiceNoteFields.TranslatedText + "' ";
                 var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
                 return EmpNotificationList;
             }
@@ -813,6 +1075,8 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
         }
+
+        #endregion
 
     }
 }

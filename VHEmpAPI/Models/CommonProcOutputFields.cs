@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -255,6 +256,13 @@ namespace VHEmpAPI.Shared
         public class Resp_id_name
         {
             public string? Id { get; set; }
+            public string? Name { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_id_int_name
+        {
+            public int? Id { get; set; }
             public string? Name { get; set; }
         }
 
@@ -720,5 +728,148 @@ namespace VHEmpAPI.Shared
             public string? TranslatedText { get; set; }
         }
 
+        [Keyless]
+        public class Resp_txt_name_value
+        {
+            public string? Txt { get; set; }
+            public string? Name { get; set; }
+            public string? Value { get; set; }
+        }
+
+        [Keyless]
+        public class InvReq_Get_Query
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? TYPE { get; set; }
+            public string? Top10_40 { get; set; }
+            public string? IPD { get; set; }
+            public string? SrchService { get; set; }
+            public string? InvType { get; set; }
+            public string? SrvGrp { get; set; }
+            public string? ExtLabNm { get; set; }
+            public string? Val7 { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_InvReq_Get_Query
+        {
+            public string? Name { get; set; }
+            public int? id { get; set; }
+            public int? cnt { get; set; }
+            public string? Value { get; set; }
+            public string? Txt { get; set; }
+            public string? sup_name { get; set; }
+        }
+
+        [Keyless]
+        public class SaveInvReqIPD
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? Action { get; set; }
+            public string? IPDNo { get; set; }
+            public string? UHID { get; set; }
+            public DateTime? DT { get; set; }
+            public string? ReqTyp { get; set; }
+            public string? Rmk { get; set; }
+            public string? UsrNm { get; set; }
+            public string? Emerg { get; set; }
+            public string? ClinicRmk { get; set; }
+            public string? InvPriority { get; set; }
+        }
+
+        public class RequestSheetIPD
+        {
+            public string? UHIDNo { get; set; }
+            public string? IPDNo { get; set; }
+            public string? ReqType { get; set; }
+            public string? Remark { get; set; }
+            public string? Username { get; set; }
+            public DateTime? Dt { get; set; }
+            public string? Action { get; set; }
+            public string? IsEmergency { get; set; }
+            public string? ClinicRemark { get; set; }
+            public string? InvestPriority { get; set; }
+
+            public int? ReqId { get; set; }
+            public int? Dr_Inst_Id { get; set; }
+            public int? Bill_Detail_Id { get; set; }
+
+            public List<RequestSheetDetailsIPD>? LabDetail { get; set; }
+            public List<RequestSheetDetailsIPD>? RadioDetail { get; set; }
+            public List<RequestSheetDetailsIPD>? OtherDetail { get; set; }
+            public DataRowState RowState { get; set; } = DataRowState.Unchanged;
+        }
+
+        public class RequestSheetDetailsIPD
+        {
+            public int? MReqId { get; set; }
+            public string? ServiceName { get; set; }
+            public int? ServiceId { get; set; }
+            public string? Username { get; set; }
+            public string? InvSrc { get; set; }
+            public string? ReqTyp { get; set; }
+            public string? UHIDNo { get; set; }
+            public string? IPDNo { get; set; }
+            public int? DrID { get; set; }
+            public string? DrNAME { get; set; }
+
+            public int? Dr_Inst_Id { get; set; }
+            public int? Bill_Detail_Id { get; set; }
+            public DataRowState RowState { get; set; } = DataRowState.Unchanged;
+            public string Action { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_InvReq_Get_HistData
+        {
+            public int? RequisitionNo { get; set; }
+            public string? Date { get; set; }
+            public string? InvestigationType { get; set; }
+            public string? InvestigationPriority { get; set; }
+            public string? EntryDate { get; set; }
+            public string? User { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_InvReq_SelReq_HistDetail
+        {
+            public int? id { get; set; }
+            public int? RequestID { get; set; }
+            public string? ServiceName { get; set; }
+            public string? ReqTyp { get; set; }
+            public string? ServiceGroup { get; set; }
+            public string? InvestigationSource { get; set; }
+            public int? testid { get; set; }
+            public string? Status { get; set; }
+            public int? labflg { get; set; }
+        }
+
+        [Keyless]
+        public class LoginId_EmpId_SrchDr
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? SearchText { get; set; }
+            public string? Srv { get; set; }
+        }
+
+        [Keyless]
+        public class WebEmpMobileCreds
+        {
+            public string? LoginId { get; set; }
+            public string? MobileNo { get; set; }
+            public string? Password { get; set; }
+        }
+
+        [Keyless]
+        public class RespWebCreds
+        {
+            public string? IsValidCreds { get; set; }
+            public string? Message { get; set; }
+            public string? WebEmpName { get; set; }
+            public string? WebEmpId { get; set; }
+        }
     }
 }

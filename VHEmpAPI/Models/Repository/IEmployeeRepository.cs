@@ -55,6 +55,15 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<EMPNotificationList>> GetEMPNotificationsList(string loginId, string EmpId, int? days, string? tag, string? fromDate, string? toDate);
         Task<IEnumerable<IsValidData>> UpdateNotification_Read(string loginId, string NotificationId);
         Task<IEnumerable<IsValidData>> Save_DoctorVoiceNote(VoiceNoteFields voiceNoteFields);
-
+        Task<IEnumerable<CommonProcOutputFields.Resp_id_name>> EmpApp_GetExternalLabName(string EmpId, string LoginId);
+        Task<IEnumerable<CommonProcOutputFields.Resp_name>> EmpApp_InvReq_GetServiceGrp(string EmpId, string LoginId, string SearchText);
+        Task<IEnumerable<CommonProcOutputFields.Resp_txt_name_value>> EmpApp_InvReq_SearchService(string EmpId, string LoginId, string SearchText);
+        Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_Get_Query>> EmpApp_InvReq_Get_Query(InvReq_Get_Query invReq_Get_Query);
+        Task<RequestSheetIPD> SaveRequestSheetIPD_Dapper(RequestSheetIPD model);
+        Task<IEnumerable<CommonProcOutputFields.SavedYesNo>> SaveRequestSheetDetailsIPD_Dapper(List<RequestSheetDetailsIPD> list);
+        Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_Get_HistData>> EmpApp_InvReq_Get_HIstoryData(InvReq_Get_Query invReq_Get_Query);
+        Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_SelReq_HistDetail>> EmpApp_InvReq_SelReq_HistoryDetail(InvReq_Get_Query invReq_Get_Query);
+        Task<IEnumerable<CommonProcOutputFields.Resp_id_int_name>> EmpApp_InvReq_SearchDrName(string EmpId, string LoginId, string SearchText, string Srv);
+        Task<IEnumerable<CommonProcOutputFields.RespWebCreds>> Validate_Web_Creds(WebEmpMobileCreds mobileCreds);
     }
 }

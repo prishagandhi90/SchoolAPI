@@ -21,7 +21,7 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<TokenData> TokenData { get; set; }
-
+        
         [NotMapped]
         public DbSet<LoginId_TokenData> LoginId_TokenData { get; set; }
 
@@ -54,6 +54,8 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<Resp_name>? Resp_Name { get; set; }
+        [NotMapped]
+        public DbSet<Resp_txt_name_value>? Resp_txt_name_val { get; set; }
 
         [NotMapped]
         public DbSet<Resp_LvDelayReason>? Resp_LvDelayReason { get; set; }
@@ -111,6 +113,21 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<ForceUpdateYN> ForceUpdateYN { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_InvReq_Get_Query> Resp_InvReq_Get_Qry { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_InvReq_Get_HistData> Resp_InvReq_Get_HistData { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_InvReq_SelReq_HistDetail> Resp_InvReq_SelReq_HistDetail { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_id_int_name>? Resp_id_int_name { get; set; }
+
+        [NotMapped]
+        public DbSet<RespWebCreds> RespWebCreds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
