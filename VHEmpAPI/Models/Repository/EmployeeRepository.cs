@@ -89,8 +89,26 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_Validate_Emp_Mobile_Pass @p_Mobile = '" + mobileCreds.MobileNo + "', @p_Password = '" + mobileCreds.Password + "' ";
-                var IsValidData = await AppDbContextAdm.TokenData.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_Validate_Emp_Mobile_Pass @p_Mobile = '" + mobileCreds.MobileNo + "', @p_Password = '" + mobileCreds.Password + "' ";
+                //var IsValidData = await AppDbContextAdm.TokenData.FromSqlRaw(sqlStr).ToListAsync();
+                //var IsValidData = await AppDbContextAdm.TokenData
+                //                                                .FromSqlRaw("EXEC dbo.EmpApp_Validate_Emp_Mobile_Pass @p_Mobile = {0}, @p_Password = {1}",
+                //                                                    mobileCreds.MobileNo,
+                //                                                    mobileCreds.Password)
+                //                                                .ToListAsync();
+
+                #endregion
+
+                var mobileParam = new SqlParameter("@p_Mobile", mobileCreds.MobileNo ?? (object)DBNull.Value);
+                var passwordParam = new SqlParameter("@p_Password", mobileCreds.Password ?? (object)DBNull.Value);
+
+                var IsValidData = await AppDbContextAdm.TokenData
+                                            .FromSqlRaw("EXEC dbo.EmpApp_Validate_Emp_Mobile_Pass @p_Mobile, @p_Password",
+                                                mobileParam, passwordParam)
+                                            .ToListAsync();
+
                 return IsValidData;
             }
             catch (Exception ex)
@@ -104,8 +122,23 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "select * from dbo.EmpApp_IsTokenValid('" + TokenNo + "', '" + LoginId + "') ";
-                var GetToken = await AppDbContextAdm.IsValidToken.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "select * from dbo.EmpApp_IsTokenValid('" + TokenNo + "', '" + LoginId + "') ";
+                //var GetToken = await AppDbContextAdm.IsValidToken.FromSqlRaw(sqlStr).ToListAsync();
+                //var GetToken = await AppDbContextAdm.IsValidToken
+                //                                                .FromSqlRaw("SELECT * FROM dbo.EmpApp_IsTokenValid({0}, {1})", TokenNo, LoginId)
+                //                                                .ToListAsync();
+
+                #endregion
+
+                var tokenParam = new SqlParameter("@TokenNo", TokenNo ?? (object)DBNull.Value);
+                var loginParam = new SqlParameter("@LoginId", LoginId ?? (object)DBNull.Value);
+
+                var GetToken = await AppDbContextAdm.IsValidToken
+                    .FromSqlRaw("SELECT * FROM dbo.EmpApp_IsTokenValid(@TokenNo, @LoginId)", tokenParam, loginParam)
+                    .ToListAsync();
+
                 return GetToken;
             }
             catch (TaskCanceledException ex)
@@ -124,12 +157,56 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.DrApp_Save_Token_UserCreds_ReturnToken @p_Mobile_No = '" + model.MobileNo + "', " +
-                                "@p_TokenNo = '" + TokenNo + "', @p_DeviceType = '" + model.DeviceType + "'," +
-                                "@p_DeviceName = '" + model.DeviceName + "', @p_OSType = '" + model.OSType + "'," +
-                                "@p_DeviceId = '" + model.DeviceToken + "', @p_UserType = 'EMP', " +
-                                "@p_FirebaseId = '" + model.FirebaseId + "' ";
-                var GetToken = await AppDbContextAdm.LoginId_TokenData.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.DrApp_Save_Token_UserCreds_ReturnToken @p_Mobile_No = '" + model.MobileNo + "', " +
+                //                "@p_TokenNo = '" + TokenNo + "', @p_DeviceType = '" + model.DeviceType + "'," +
+                //                "@p_DeviceName = '" + model.DeviceName + "', @p_OSType = '" + model.OSType + "'," +
+                //                "@p_DeviceId = '" + model.DeviceToken + "', @p_UserType = 'EMP', " +
+                //                "@p_FirebaseId = '" + model.FirebaseId + "' ";
+                //var GetToken = await AppDbContextAdm.LoginId_TokenData.FromSqlRaw(sqlStr).ToListAsync();
+                //var GetToken = await AppDbContextAdm.LoginId_TokenData
+                //                                                    .FromSqlRaw(
+                //                                                        @"EXEC dbo.DrApp_Save_Token_UserCreds_ReturnToken 
+                //                                                            @p_Mobile_No = {0}, 
+                //                                                            @p_TokenNo = {1}, 
+                //                                                            @p_DeviceType = {2}, 
+                //                                                            @p_DeviceName = {3}, 
+                //                                                            @p_OSType = {4}, 
+                //                                                            @p_DeviceId = {5}, 
+                //                                                            @p_UserType = {6}, 
+                //                                                            @p_FirebaseId = {7}",
+                //                                                        model.MobileNo,
+                //                                                        TokenNo,
+                //                                                        model.DeviceType,
+                //                                                        model.DeviceName,
+                //                                                        model.OSType,
+                //                                                        model.DeviceToken,
+                //                                                        "EMP", // hardcoded string is okay
+                //                                                        model.FirebaseId
+                //                                                    )
+                //                                                    .ToListAsync();
+
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_Mobile_No", model.MobileNo ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_TokenNo", TokenNo ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_DeviceType", model.DeviceType ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_DeviceName", model.DeviceName ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_OSType", model.OSType ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_DeviceId", model.DeviceToken ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_UserType", "EMP"),
+                                        new SqlParameter("@p_FirebaseId", model.FirebaseId ?? (object)DBNull.Value),
+                                    };
+
+                var GetToken = await AppDbContextAdm.LoginId_TokenData
+                                        .FromSqlRaw("EXEC dbo.DrApp_Save_Token_UserCreds_ReturnToken " +
+                                                    "@p_Mobile_No, @p_TokenNo, @p_DeviceType, @p_DeviceName, " +
+                                                    "@p_OSType, @p_DeviceId, @p_UserType, @p_FirebaseId", parameters)
+                                        .ToListAsync();
+
                 return GetToken;
             }
             catch (TaskCanceledException ex)
@@ -148,10 +225,31 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.Display_Emp_DashboardList @p_TokenNo = '" + TokenNo + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
+                #region commented Old Working codes
+
+                //string sqlStr = "exec dbo.Display_Emp_DashboardList @p_TokenNo = '" + TokenNo + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
                 //var DashboardData = await AppDbContextAdm.DashboardList.FromSqlRaw(sqlStr).ToListAsync();
-                var DashboardData = await AppDbContextAdm.DashboardList.FromSqlRaw(sqlStr).ToListAsync();
+
+                //var DashboardData = await AppDbContextAdm.DashboardList
+                //                                                    .FromSqlRaw(
+                //                                                        "EXEC dbo.Display_Emp_DashboardList @p_TokenNo = {0}, @p_LoginId = {1}",
+                //                                                        TokenNo,
+                //                                                        LoginId
+                //                                                    )
+                //                                                    .ToListAsync();
+
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_TokenNo", TokenNo ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value),
+                                    };
+
+                var DashboardData = await AppDbContextAdm.DashboardList
+                                            .FromSqlRaw("EXEC dbo.Display_Emp_DashboardList @p_TokenNo, @p_LoginId", parameters)
+                                            .ToListAsync();
 
                 return DashboardData;
             }
@@ -173,9 +271,18 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
+                #region commented old working code
+
                 //string sqlStr = "exec [webpacepayroll].dbo.GetQuery 'Edit_Att_Mnth_yr', '', '', '' ";
-                string sqlStr = "exec dbo.GetMonthYear_EmpInfo ";
-                var DashboardData = await AppDbContextAdm.Ddl_Value_Nm.FromSqlRaw(sqlStr).ToListAsync();
+                //string sqlStr = "exec dbo.GetMonthYear_EmpInfo ";
+                //var DashboardData = await AppDbContextAdm.Ddl_Value_Nm.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Ddl_Value_Nm
+                                                                    .FromSqlRaw("EXEC dbo.GetMonthYear_EmpInfo")
+                                                                    .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -189,9 +296,20 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.GetEmpMisPunchDtl_Summ @p_EmpId = '" + EmpId + "', " +
-                                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_MispunchDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.GetEmpMisPunchDtl_Summ @p_EmpId = '" + EmpId + "', " +
+                //                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_MispunchDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId);
+                var monYrParam = new SqlParameter("@p_MonYr", mispunchDtl_EmpInfo.MonthYr ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_MispunchDtl_EmpInfo
+                                                                                .FromSqlRaw("EXEC dbo.GetEmpMisPunchDtl_Summ @p_EmpId, @p_MonYr", empIdParam, monYrParam)
+                                                                                .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -205,9 +323,23 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.GetEmpAttDtl_Detail @p_EmpId = '" + EmpId + "', " +
-                                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_AttDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.GetEmpAttDtl_Detail @p_EmpId = '" + EmpId + "', " +
+                //                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_AttDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                //string sqlStr = "exec dbo.GetEmpAttDtl_Detail @p_EmpId = '" + EmpId + "', " +
+                //"@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_AttDtl_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId);
+                var monYrParam = new SqlParameter("@p_MonYr", mispunchDtl_EmpInfo.MonthYr ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_AttDtl_EmpInfo
+                    .FromSqlRaw("EXEC dbo.GetEmpAttDtl_Detail @p_EmpId, @p_MonYr", empIdParam, monYrParam)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -221,9 +353,21 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetEmpAttDtl_Summ @p_EmpId = '" + EmpId + "', " +
-                                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_AttSumm_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetEmpAttDtl_Summ @p_EmpId = '" + EmpId + "', " +
+                //                "@p_MonYr = '" + mispunchDtl_EmpInfo.MonthYr + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_AttSumm_EmpInfo.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId);
+                var monYrParam = new SqlParameter("@p_MonYr", mispunchDtl_EmpInfo.MonthYr ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_AttSumm_EmpInfo
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetEmpAttDtl_Summ @p_EmpId, @p_MonYr", empIdParam, monYrParam)
+                    .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -240,9 +384,20 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetEmpSumm_DashData @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + loginIdNum.LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.EmpSummary_Dashboard.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetEmpSumm_DashData @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + loginIdNum.LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.EmpSummary_Dashboard.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId);
+                var loginIdParam = new SqlParameter("@p_LoginId", loginIdNum.LoginId ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.EmpSummary_Dashboard
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetEmpSumm_DashData @p_EmpId, @p_LoginId", empIdParam, loginIdParam)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -259,11 +414,26 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveDays @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + getLeaveDays.LoginId + "', " +
-                                "@p_ToDt = '" + getLeaveDays.LeaveDate + "', " +
-                                "@p_LeaveType = '" + getLeaveDays.LeaveType + "' ";
-                var DashboardData = await AppDbContextAdm.OutSingleString.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLeaveDays @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + getLeaveDays.LoginId + "', " +
+                //                "@p_ToDt = '" + getLeaveDays.LeaveDate + "', " +
+                //                "@p_LeaveType = '" + getLeaveDays.LeaveType + "' ";
+                //var DashboardData = await AppDbContextAdm.OutSingleString.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", getLeaveDays.LoginId ?? (object)DBNull.Value);
+                var toDateParam = new SqlParameter("@p_ToDt", getLeaveDays.LeaveDate ?? (object)DBNull.Value);
+                var leaveTypeParam = new SqlParameter("@p_LeaveType", getLeaveDays.LeaveType ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.OutSingleString
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetLeaveDays @p_EmpId, @p_LoginId, @p_ToDt, @p_LeaveType",
+                        empIdParam, loginIdParam, toDateParam, leaveTypeParam)
+                    .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -277,9 +447,21 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveNames @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLeaveNames @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_Value_Name
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetLeaveNames @p_EmpId, @p_LoginId", empIdParam, loginIdParam)
+                    .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -293,9 +475,20 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveReason @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLeaveReason @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_Name
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetLeaveReason @p_EmpId, @p_LoginId", empIdParam, loginIdParam)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -309,9 +502,21 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveDelayReason @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_LvDelayReason.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLeaveDelayReason @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_LvDelayReason.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_LvDelayReason
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetLeaveDelayReason @p_EmpId, @p_LoginId", empIdParam, loginIdParam)
+                    .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -325,9 +530,20 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveRelieverNm @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLeaveRelieverNm @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value);
+
+                var DashboardData = await AppDbContextAdm.Resp_id_name
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetLeaveRelieverNm @p_EmpId, @p_LoginId", empIdParam, loginIdParam)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -341,9 +557,23 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLeaveEntryList @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "', @p_Flag = '" + Flag + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_LvEntryList.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLeaveEntryList @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "', @p_Flag = '" + Flag + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_LvEntryList.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value);
+                var flagParam = new SqlParameter("@p_Flag", Flag ?? (object)DBNull.Value);
+
+                // Secure query call
+                var DashboardData = await AppDbContextAdm.Resp_LvEntryList
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetLeaveEntryList @p_EmpId, @p_LoginId, @p_Flag",
+                        empIdParam, loginIdParam, flagParam)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -357,9 +587,23 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetHeaderList @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "', @p_Flag = '" + Flag + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_HeaderEntryList.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetHeaderList @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "', @p_Flag = '" + Flag + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_HeaderEntryList.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var empIdParam = new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value);
+                var loginIdParam = new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value);
+                var flagParam = new SqlParameter("@p_Flag", Flag ?? (object)DBNull.Value);
+
+                // Safe execution with parameters
+                var DashboardData = await AppDbContextAdm.Resp_HeaderEntryList
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetHeaderList @p_EmpId, @p_LoginId, @p_Flag",
+                        empIdParam, loginIdParam, flagParam)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -373,17 +617,47 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_SaveLeaveEntry @p_EmpId = '" + EmpId + "', @p_LoginId = '" + saveLeaveEntry.LoginId + "', " +
-                                "@p_entrytype = '" + saveLeaveEntry.EntryType + "', @p_leaveshortname = '" + saveLeaveEntry.LeaveShortName + "', " +
-                                "@p_leavefullname = '" + saveLeaveEntry.LeaveFullName + "', " +
-                                "@p_fromdate = '" + Convert.ToDateTime(saveLeaveEntry.FromDate).ToString("MM/dd/yyyy hh:mm:ss tt") + "', " +
-                                "@p_todate = '" + Convert.ToDateTime(saveLeaveEntry.ToDate).ToString("MM/dd/yyyy hh:mm:ss tt") + "', " +
-                                "@p_reason = '" + saveLeaveEntry.Reason + "', @p_note = '" + saveLeaveEntry.Note + "', " +
-                                "@p_leavedays = '" + saveLeaveEntry.LeaveDays + "', @p_overtimeminutes = '" + saveLeaveEntry.OverTimeMinutes + "', " +
-                                "@p_usr_nm = '" + saveLeaveEntry.Usr_Nm + "', @p_reliever_empcode = '" + saveLeaveEntry.Reliever_Empcode + "', " +
-                                "@p_DelayLVNote = '" + saveLeaveEntry.DelayLVNote + "', @p_LeaveDivision = '" + saveLeaveEntry.LeaveDivision + "', " +
-                                "@p_Flag = '" + saveLeaveEntry.Flag + "' ";
-                var DashboardData = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_SaveLeaveEntry @p_EmpId = '" + EmpId + "', @p_LoginId = '" + saveLeaveEntry.LoginId + "', " +
+                //                "@p_entrytype = '" + saveLeaveEntry.EntryType + "', @p_leaveshortname = '" + saveLeaveEntry.LeaveShortName + "', " +
+                //                "@p_leavefullname = '" + saveLeaveEntry.LeaveFullName + "', " +
+                //                "@p_fromdate = '" + Convert.ToDateTime(saveLeaveEntry.FromDate).ToString("MM/dd/yyyy hh:mm:ss tt") + "', " +
+                //                "@p_todate = '" + Convert.ToDateTime(saveLeaveEntry.ToDate).ToString("MM/dd/yyyy hh:mm:ss tt") + "', " +
+                //                "@p_reason = '" + saveLeaveEntry.Reason + "', @p_note = '" + saveLeaveEntry.Note + "', " +
+                //                "@p_leavedays = '" + saveLeaveEntry.LeaveDays + "', @p_overtimeminutes = '" + saveLeaveEntry.OverTimeMinutes + "', " +
+                //                "@p_usr_nm = '" + saveLeaveEntry.Usr_Nm + "', @p_reliever_empcode = '" + saveLeaveEntry.Reliever_Empcode + "', " +
+                //                "@p_DelayLVNote = '" + saveLeaveEntry.DelayLVNote + "', @p_LeaveDivision = '" + saveLeaveEntry.LeaveDivision + "', " +
+                //                "@p_Flag = '" + saveLeaveEntry.Flag + "' ";
+                //var DashboardData = await AppDbContextAdm.SavedYesNo.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_LoginId", saveLeaveEntry.LoginId ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_entrytype", saveLeaveEntry.EntryType ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_leaveshortname", saveLeaveEntry.LeaveShortName ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_leavefullname", saveLeaveEntry.LeaveFullName ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_fromdate", saveLeaveEntry.FromDate ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_todate", saveLeaveEntry.ToDate ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_reason", saveLeaveEntry.Reason ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_note", saveLeaveEntry.Note ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_leavedays", saveLeaveEntry.LeaveDays ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_overtimeminutes", saveLeaveEntry.OverTimeMinutes ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_usr_nm", saveLeaveEntry.Usr_Nm ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_reliever_empcode", saveLeaveEntry.Reliever_Empcode ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_DelayLVNote", saveLeaveEntry.DelayLVNote ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_LeaveDivision", saveLeaveEntry.LeaveDivision ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_Flag", saveLeaveEntry.Flag ?? (object)DBNull.Value)
+                                    };
+
+                var DashboardData = await AppDbContextAdm.SavedYesNo
+                    .FromSqlRaw("EXEC dbo.EmpApp_SaveLeaveEntry @p_EmpId, @p_LoginId, @p_entrytype, @p_leaveshortname, @p_leavefullname, " +
+                                "@p_fromdate, @p_todate, @p_reason, @p_note, @p_leavedays, @p_overtimeminutes, @p_usr_nm, " +
+                                "@p_reliever_empcode, @p_DelayLVNote, @p_LeaveDivision, @p_Flag", parameters)
+                    .ToListAsync();
                 return new List<CommonProcOutputFields.SavedYesNo>
                 {
                     new CommonProcOutputFields.SavedYesNo { SavedYN = "Y" }
@@ -409,9 +683,23 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetShiftWeekList @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetShiftWeekList @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_EmpId", EmpId ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value)
+                                    };
+
+                var DashboardData = await AppDbContextAdm.Resp_Value_Name
+                    .FromSqlRaw("EXEC dbo.EmpApp_GetShiftWeekList @p_EmpId, @p_LoginId", parameters)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -425,14 +713,12 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetEmpShiftReport @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_DtRange = '" + DtRange + "' ";
-                //var DashboardData = await AppDbContextAdm.DrDynamicDt.FromSqlRaw(sqlStr).ToListAsync();
-                //return DashboardData;
-
                 DataTable objresutl = new DataTable();
-
                 try
                 {
+                    string sqlStr = "exec dbo.EmpApp_GetEmpShiftReport @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_DtRange = '" + DtRange + "' ";
+                    //var DashboardData = await AppDbContextAdm.DrDynamicDt.FromSqlRaw(sqlStr).ToListAsync();
+                    //return DashboardData;
                     objresutl = _dbMethods.GetDataTable(sqlStr);
 
                     return objresutl;
@@ -649,8 +935,22 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.GetDrNotifications @p_LoginId = '" + loginId + "', @p_DrId = '" + EmpId + "' ";
-                var DrNotification = await AppDbContextAdm.DrNotification.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.GetDrNotifications @p_LoginId = '" + loginId + "', @p_DrId = '" + EmpId + "' ";
+                //var DrNotification = await AppDbContextAdm.DrNotification.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_LoginId", loginId),
+                                        new SqlParameter("@p_DrId", EmpId)
+                                    };
+
+                var DrNotification = await AppDbContextAdm.DrNotification
+                    .FromSqlRaw("exec dbo.GetDrNotifications @p_LoginId, @p_DrId", parameters)
+                    .ToListAsync();
                 return DrNotification;
             }
             catch (Exception ex)
@@ -666,9 +966,24 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetModuleRights @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "', @p_ModuleName = '" + ModuleName + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetModuleRights @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "', @p_ModuleName = '" + ModuleName + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_EmpId", EmpId),
+                                        new SqlParameter("@p_LoginId", LoginId),
+                                        new SqlParameter("@p_ModuleName", ModuleName)
+                                    };
+
+                var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights
+                    .FromSqlRaw("exec dbo.EmpApp_GetModuleRights @p_EmpId, @p_LoginId, @p_ModuleName", parameters)
+                    .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -682,9 +997,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetEmpAppScreenRights @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "', @p_ModuleName = '" + ModuleName + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights.FromSqlRaw(sqlStr).ToListAsync();
+                #region commeneted old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetEmpAppScreenRights @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "', @p_ModuleName = '" + ModuleName + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_ModuleScreenRights
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_GetEmpAppScreenRights @p_EmpId = {EmpId}, @p_LoginId = {LoginId}, @p_ModuleName = {ModuleName}")
+                                            .ToListAsync();
                 return DashboardData;
             }
             catch (Exception ex)
@@ -704,9 +1027,18 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetOrganizations @p_EmpId = '" + EmpId + "', " +
-                                "@p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Organizations.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetOrganizations @p_EmpId = '" + EmpId + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Organizations.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Organizations
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_GetOrganizations @p_EmpId = {EmpId}, @p_LoginId = {LoginId}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -723,10 +1055,20 @@ namespace VHEmpAPI.Models.Repository
                 string Orgs_commaSep = string.Join(",", Orgs);
                 string Floors_commaSep = string.Join(",", Floors);
                 string Wards_commaSep = string.Join(",", Wards);
-                string sqlStr = "exec dbo.EmpApp_GetDeptPatientList @p_EmpId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
-                                "@p_PrefixText = '" + PrefixText + "', @p_Orgs = '" + Orgs_commaSep + "', " +
-                                "@p_Floors = '" + Floors_commaSep + "', @p_Wards = '" + Wards_commaSep + "' ";
-                var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
+
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetDeptPatientList @p_EmpId = '" + DrId + "', @p_LoginId = '" + LoginId + "', " +
+                //                "@p_PrefixText = '" + PrefixText + "', @p_Orgs = '" + Orgs_commaSep + "', " +
+                //                "@p_Floors = '" + Floors_commaSep + "', @p_Wards = '" + Wards_commaSep + "' ";
+                //var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.PatientList
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_GetDeptPatientList @p_EmpId = {DrId}, @p_LoginId = {LoginId}, @p_PrefixText = {PrefixText}, @p_Orgs = {Orgs_commaSep}, @p_Floors = {Floors_commaSep}, @p_Wards = {Wards_commaSep}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -740,9 +1082,18 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_SortDeptPatientList @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
-                                "@p_SortType = '" + SortType + "' ";
-                var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_SortDeptPatientList @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
+                //                "@p_SortType = '" + SortType + "' ";
+                //var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.PatientList
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_SortDeptPatientList @p_EmpId = {EmpId}, @p_LoginId = {LoginId}, @p_SortType = {SortType}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -821,8 +1172,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetExternalLabNm @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetExternalLabNm @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_id_name
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_GetExternalLabNm @p_EmpId = {EmpId}, @p_LoginId = {LoginId}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -836,8 +1196,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_InvReq_GetServiceGrp @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '"+ SearchText +"' ";
-                var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_GetServiceGrp @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_Name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_Name
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_InvReq_GetServiceGrp @p_EmpId = {EmpId}, @p_LoginId = {LoginId}, @p_SearchText = {SearchText}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -851,8 +1220,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_InvReq_SearchService @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_txt_name_val.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_SearchService @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_txt_name_val.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_txt_name_val
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_InvReq_SearchService @p_EmpId = {EmpId}, @p_LoginId = {LoginId}, @p_SearchText = {SearchText}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -866,8 +1244,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_InvReq_SearchDrName @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "', @p_Srv = '"+ Srv +"' ";
-                var DashboardData = await AppDbContextAdm.Resp_id_int_name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_SearchDrName @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "', @p_Srv = '" + Srv + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_id_int_name.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_id_int_name
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_InvReq_SearchDrName @p_EmpId = {EmpId}, @p_LoginId = {LoginId}, @p_SearchText = {SearchText}, @p_Srv = {Srv}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -881,11 +1268,31 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_InvReq_Get_Query @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
-                                "@P_TYPE = '" + invReq_Get_Query.TYPE + "', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.IPD + "', " +
-                                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
-                                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_Qry.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_Get_Query @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
+                //                "@P_TYPE = '" + invReq_Get_Query.TYPE + "', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.IPD + "', " +
+                //                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
+                //                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_Qry.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_Qry
+                                            .FromSqlInterpolated($@"
+                                                exec dbo.EmpApp_InvReq_Get_Query 
+                                                    @p_EmpId = {invReq_Get_Query.EmpId}, 
+                                                    @p_LoginId = {invReq_Get_Query.LoginId}, 
+                                                    @P_TYPE = {invReq_Get_Query.TYPE}, 
+                                                    @P_VAL_1 = {invReq_Get_Query.Top10_40}, 
+                                                    @P_VAL_2 = {invReq_Get_Query.IPD}, 
+                                                    @P_VAL_3 = {invReq_Get_Query.SrchService}, 
+                                                    @P_VAL_4 = {invReq_Get_Query.InvType}, 
+                                                    @P_VAL_5 = {invReq_Get_Query.SrvGrp}, 
+                                                    @P_VAL_6 = {invReq_Get_Query.ExtLabNm}, 
+                                                    @P_VAL_7 = {invReq_Get_Query.Val7}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -973,11 +1380,31 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_InvReq_Get_HIstoryData @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
-                                "@P_TYPE = 'GET_INV_HIS_MASTER', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.Top10_40 + "', " +
-                                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
-                                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_HistData.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_Get_HIstoryData @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
+                //                "@P_TYPE = 'GET_INV_HIS_MASTER', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.Top10_40 + "', " +
+                //                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
+                //                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_HistData.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_HistData
+                                            .FromSqlInterpolated($@"
+                                                exec dbo.EmpApp_InvReq_Get_HIstoryData 
+                                                    @p_EmpId = {invReq_Get_Query.EmpId}, 
+                                                    @p_LoginId = {invReq_Get_Query.LoginId}, 
+                                                    @P_TYPE = {"GET_INV_HIS_MASTER"}, 
+                                                    @P_VAL_1 = {invReq_Get_Query.Top10_40}, 
+                                                    @P_VAL_2 = {invReq_Get_Query.Top10_40}, 
+                                                    @P_VAL_3 = {invReq_Get_Query.SrchService}, 
+                                                    @P_VAL_4 = {invReq_Get_Query.InvType}, 
+                                                    @P_VAL_5 = {invReq_Get_Query.SrvGrp}, 
+                                                    @P_VAL_6 = {invReq_Get_Query.ExtLabNm}, 
+                                                    @P_VAL_7 = {invReq_Get_Query.Val7}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -991,11 +1418,31 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_InvReq_SelReq_HistoryDetail @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
-                                "@P_TYPE = 'GET_INV_HIS_DETAIL', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.Top10_40 + "', " +
-                                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
-                                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
-                var DashboardData = await AppDbContextAdm.Resp_InvReq_SelReq_HistDetail.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_SelReq_HistoryDetail @p_EmpId = '" + invReq_Get_Query.EmpId + "', @p_LoginId = '" + invReq_Get_Query.LoginId + "', " +
+                //                "@P_TYPE = 'GET_INV_HIS_DETAIL', @P_VAL_1 = '" + invReq_Get_Query.Top10_40 + "', @P_VAL_2 = '" + invReq_Get_Query.Top10_40 + "', " +
+                //                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
+                //                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_InvReq_SelReq_HistDetail.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_InvReq_SelReq_HistDetail
+                                            .FromSqlInterpolated($@"
+                                                exec dbo.EmpApp_InvReq_SelReq_HistoryDetail 
+                                                    @p_EmpId = {invReq_Get_Query.EmpId}, 
+                                                    @p_LoginId = {invReq_Get_Query.LoginId}, 
+                                                    @P_TYPE = {"GET_INV_HIS_DETAIL"}, 
+                                                    @P_VAL_1 = {invReq_Get_Query.Top10_40}, 
+                                                    @P_VAL_2 = {invReq_Get_Query.Top10_40}, 
+                                                    @P_VAL_3 = {invReq_Get_Query.SrchService}, 
+                                                    @P_VAL_4 = {invReq_Get_Query.InvType}, 
+                                                    @P_VAL_5 = {invReq_Get_Query.SrvGrp}, 
+                                                    @P_VAL_6 = {invReq_Get_Query.ExtLabNm}, 
+                                                    @P_VAL_7 = {invReq_Get_Query.Val7}")
+                                            .ToListAsync();
+
                 return DashboardData;
             }
             catch (Exception ex)
@@ -1009,8 +1456,21 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_Validate_Web_Creds @p_LoginId = '" + mobileCreds.LoginId + "', @p_Mobile = '" + mobileCreds.MobileNo + "', @p_Password = '" + mobileCreds.Password + "' ";
-                var IsValidData = await AppDbContextAdm.RespWebCreds.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_Validate_Web_Creds @p_LoginId = '" + mobileCreds.LoginId + "', @p_Mobile = '" + mobileCreds.MobileNo + "', @p_Password = '" + mobileCreds.Password + "' ";
+                //var IsValidData = await AppDbContextAdm.RespWebCreds.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var IsValidData = await AppDbContextAdm.RespWebCreds
+                                        .FromSqlInterpolated($@"
+                                            exec dbo.EmpApp_Validate_Web_Creds 
+                                                @p_LoginId = {mobileCreds.LoginId}, 
+                                                @p_Mobile = {mobileCreds.MobileNo}, 
+                                                @p_Password = {mobileCreds.Password}")
+                                        .ToListAsync();
+
                 return IsValidData;
             }
             catch (Exception ex)
@@ -1019,7 +1479,35 @@ namespace VHEmpAPI.Models.Repository
             }
             return (IEnumerable<RespWebCreds>)Enumerable.Empty<string>();
         }
-        
+
+        public async Task EmpApp_Delete_InvReq_Detail(InvReq_Del_ReqDtl invReq_Del_ReqDtl)
+        {
+            try
+            {
+                //string sqlStr = "exec [Webpacedata2019].dbo.ValidationForDeleteInvReq @p_LoginId = '" + invReq_Del_ReqDtl.LoginId + "', " +
+                //                "@p_req_sht_dtl_id = '" + invReq_Del_ReqDtl.req_sht_dtl_id + "', @p_usr_nm = '" + invReq_Del_ReqDtl.UserName + "', " +
+                //                "@p_form_nm = '" + invReq_Del_ReqDtl.FormName + "' ";
+                ////var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_HistData.FromSqlRaw(sqlStr).ToListAsync();
+                //await AppDbContextAdm.Database.ExecuteSqlRawAsync(sqlStr);
+                await AppDbContextAdm.Database.ExecuteSqlRawAsync(
+                    "exec [Webpacedata2019].dbo.ValidationForDeleteInvReq @p_req_sht_dtl_id, @p_usr_nm, @p_form_nm",
+                    new SqlParameter("@p_req_sht_dtl_id", invReq_Del_ReqDtl.req_sht_dtl_id),
+                    new SqlParameter("@p_usr_nm", invReq_Del_ReqDtl.UserName),
+                    new SqlParameter("@p_form_nm", invReq_Del_ReqDtl.FormName)
+                );
+            }
+            catch (SqlException sqlEx)
+            {
+                // You can also log this using ILogger if available
+                throw new Exception("SQL Error occurred while deleting InvReq detail: " + sqlEx.Message, sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // General catch
+                throw new Exception("An error occurred while deleting InvReq detail: " + ex.Message, ex);
+            }
+        }
+
         #endregion
 
 
@@ -1031,9 +1519,25 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EMPApp_GetEMPNotificationsList @p_LoginId = '" + loginId + "', @p_EmpId = '" + EmpId + "', " +
-                                "@p_Days = " + days + ", @p_Tag = '" + tag + "', @p_FromDate = '" + fromDate + "', @p_ToDate = '" + toDate + "' ";
-                var EmpNotificationList = await AppDbContextAdm.EMPNotifyList.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EMPApp_GetEMPNotificationsList @p_LoginId = '" + loginId + "', @p_EmpId = '" + EmpId + "', " +
+                //                "@p_Days = " + days + ", @p_Tag = '" + tag + "', @p_FromDate = '" + fromDate + "', @p_ToDate = '" + toDate + "' ";
+                //var EmpNotificationList = await AppDbContextAdm.EMPNotifyList.FromSqlRaw(sqlStr).ToListAsync();
+                
+                #endregion
+
+                var EmpNotificationList = await AppDbContextAdm.EMPNotifyList
+                                                .FromSqlInterpolated($@"
+                                                    exec dbo.EMPApp_GetEMPNotificationsList 
+                                                        @p_LoginId = {loginId}, 
+                                                        @p_EmpId = {EmpId}, 
+                                                        @p_Days = {days}, 
+                                                        @p_Tag = {tag}, 
+                                                        @p_FromDate = {fromDate}, 
+                                                        @p_ToDate = {toDate}")
+                                                .ToListAsync();
+
                 return EmpNotificationList;
             }
             catch (Exception ex)
@@ -1047,8 +1551,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EMPApp_UpdateNotification_Read @p_LoginId = '" + loginId + "', @p_NotificationId = '" + NotificationId + "' ";
-                var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+                
+                //string sqlStr = "exec dbo.EMPApp_UpdateNotification_Read @p_LoginId = '" + loginId + "', @p_NotificationId = '" + NotificationId + "' ";
+                //var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var EmpNotificationList = await AppDbContextAdm.IsValidData
+                                                .FromSqlInterpolated($@"exec dbo.EMPApp_UpdateNotification_Read @p_LoginId = {loginId}, @p_NotificationId = {NotificationId}")
+                                                .ToListAsync();
+
                 return EmpNotificationList;
             }
             catch (Exception ex)
@@ -1062,11 +1575,29 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_Save_DoctorVoiceNote @p_UHID = '" + voiceNoteFields.UHID + "', @p_IpdNo = '" + voiceNoteFields.IPDNo + "', " +
-                                "@p_PatientName = '" + voiceNoteFields.PatientName + "', @p_VoiceFileName = '" + voiceNoteFields.VoiceFileName + "', " +
-                                "@p_DoctorName = '" + voiceNoteFields.DoctorName + "', @p_LoginId = '" + voiceNoteFields.LoginId + "', " +
-                                "@p_CreatedUser = '" + voiceNoteFields.EmpID + "', @p_TranslatedText = '" + voiceNoteFields.TranslatedText + "' ";
-                var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+                #region Commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_Save_DoctorVoiceNote @p_UHID = '" + voiceNoteFields.UHID + "', @p_IpdNo = '" + voiceNoteFields.IPDNo + "', " +
+                //                "@p_PatientName = '" + voiceNoteFields.PatientName + "', @p_VoiceFileName = '" + voiceNoteFields.VoiceFileName + "', " +
+                //                "@p_DoctorName = '" + voiceNoteFields.DoctorName + "', @p_LoginId = '" + voiceNoteFields.LoginId + "', " +
+                //                "@p_CreatedUser = '" + voiceNoteFields.EmpID + "', @p_TranslatedText = '" + voiceNoteFields.TranslatedText + "' ";
+                //var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var EmpNotificationList = await AppDbContextAdm.IsValidData
+                                                    .FromSqlInterpolated($@"
+                                                        exec dbo.EmpApp_Save_DoctorVoiceNote 
+                                                        @p_UHID = {voiceNoteFields.UHID}, 
+                                                        @p_IpdNo = {voiceNoteFields.IPDNo}, 
+                                                        @p_PatientName = {voiceNoteFields.PatientName}, 
+                                                        @p_VoiceFileName = {voiceNoteFields.VoiceFileName}, 
+                                                        @p_DoctorName = {voiceNoteFields.DoctorName}, 
+                                                        @p_LoginId = {voiceNoteFields.LoginId}, 
+                                                        @p_CreatedUser = {voiceNoteFields.EmpID}, 
+                                                        @p_TranslatedText = {voiceNoteFields.TranslatedText}")
+                                                    .ToListAsync();
+
                 return EmpNotificationList;
             }
             catch (Exception ex)

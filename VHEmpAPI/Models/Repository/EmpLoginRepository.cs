@@ -22,8 +22,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_Validate_Emp_Mobile @p_Mobile = '" + MobileNo + "' ";
-                var IsValidNo = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_Validate_Emp_Mobile @p_Mobile = '" + MobileNo + "' ";
+                //var IsValidNo = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var IsValidNo = await AppDbContextAdm.IsValidData
+                                        .FromSqlInterpolated($"exec dbo.EmpApp_Validate_Emp_Mobile @p_Mobile = {(object?)MobileNo ?? DBNull.Value}")
+                                        .ToListAsync();
+
                 return IsValidNo;
             }
             catch (Exception ex)
@@ -91,8 +100,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.Send_EMP_MobileOTP @p_MobileNo = '" + respOTP.MobileNo + "' ";
-                var otp = await AppDbContextAdm.OTP.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.Send_EMP_MobileOTP @p_MobileNo = '" + respOTP.MobileNo + "' ";
+                //var otp = await AppDbContextAdm.OTP.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var otp = await AppDbContextAdm.OTP
+                                    .FromSqlInterpolated($"exec dbo.Send_EMP_MobileOTP @p_MobileNo = {respOTP.MobileNo}")
+                                    .ToListAsync();
+
                 string SMSOtp = "";
                 string Message = "";
                 if (otp != null && otp.Count() > 0)
@@ -104,6 +122,8 @@ namespace VHEmpAPI.Models.Repository
                 //if (1==2 && !String.IsNullOrEmpty(SMSOtp))
                 if (!String.IsNullOrEmpty(SMSOtp))
                 {
+                    #region commented some mobile no if condition
+
                     //if (respOTP.MobileNo == "9429728770")
                     //if (respOTP.MobileNo == "9429728770"
                     // || respOTP.MobileNo == "9905475111"
@@ -117,6 +137,9 @@ namespace VHEmpAPI.Models.Repository
                     // || respOTP.MobileNo == "9726094066"
                     //   )
                     //{
+                    
+                    #endregion
+
                     Message = $"Greetings from Venus Hospital!\n{{0}} is your OTP to log in to VENUS HOSPITAL account and it is valid for {{1}} minutes. Do not share it with anyone for security reasons.\n\nStay Safe and Healthy!\nTeam Venus Hospital.";
                     int validityMinutes = 20;
                     string formattedMessage = string.Format(Message, SMSOtp, validityMinutes);
@@ -226,8 +249,17 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLoginUserNames @p_LoginId = '" + LoginId + "' ";
-                var UsersData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old woring code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLoginUserNames @p_LoginId = '" + LoginId + "' ";
+                //var UsersData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var UsersData = await AppDbContextAdm.Resp_id_name
+                                        .FromSqlInterpolated($"exec dbo.EmpApp_GetLoginUserNames @p_LoginId = {LoginId}")
+                                        .ToListAsync();
+
                 return UsersData;
             }
             catch (Exception ex)
@@ -241,9 +273,18 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_GetLoginAsUserCreds @p_AdminMobileNo = '" + AdminMobileNo + "', " +
-                                "@p_UserNm = '" + UserNm + "' ";
-                var CredsData = await AppDbContextAdm.Resp_LoginAs_Creds.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetLoginAsUserCreds @p_AdminMobileNo = '" + AdminMobileNo + "', " +
+                //                "@p_UserNm = '" + UserNm + "' ";
+                //var CredsData = await AppDbContextAdm.Resp_LoginAs_Creds.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var CredsData = await AppDbContextAdm.Resp_LoginAs_Creds
+                                        .FromSqlInterpolated($"exec dbo.EmpApp_GetLoginAsUserCreds @p_AdminMobileNo = {AdminMobileNo}, @p_UserNm = {UserNm}")
+                                        .ToListAsync();
+
                 return CredsData;
             }
             catch (Exception ex)
@@ -262,15 +303,31 @@ namespace VHEmpAPI.Models.Repository
             try
             {
                 string safeErrorMessage = issue.ErrorMessage.Replace("'", "''");
-                string sql = $"EXEC dbo.EmpApp_ReportIssue " +
-                             $"@p_ScreenName = '{issue.ScreenName}', " +
-                             $"@p_ErrorMessage = '{safeErrorMessage}', " +
-                             $"@p_LoginID = '{issue.LoginID}', " +
-                             $"@p_TokenNo = '{issue.TokenNo}', " +
-                             $"@p_EmpID = '{issue.EmpID}', " +
-                             $"@p_DeviceInfo = '{issue.DeviceInfo}'";
 
-                await AppDbContextAdm.Database.ExecuteSqlRawAsync(sql);
+                #region commented old working code
+
+                //string sql = $"EXEC dbo.EmpApp_ReportIssue " +
+                //             $"@p_ScreenName = '{issue.ScreenName}', " +
+                //             $"@p_ErrorMessage = '{safeErrorMessage}', " +
+                //             $"@p_LoginID = '{issue.LoginID}', " +
+                //             $"@p_TokenNo = '{issue.TokenNo}', " +
+                //             $"@p_EmpID = '{issue.EmpID}', " +
+                //             $"@p_DeviceInfo = '{issue.DeviceInfo}'";
+
+                //await AppDbContextAdm.Database.ExecuteSqlRawAsync(sql);
+                
+                #endregion
+
+                await AppDbContextAdm.Database.ExecuteSqlInterpolatedAsync($@"
+                                            EXEC dbo.EmpApp_ReportIssue 
+                                                @p_ScreenName = {issue.ScreenName}, 
+                                                @p_ErrorMessage = {safeErrorMessage}, 
+                                                @p_LoginID = {issue.LoginID}, 
+                                                @p_TokenNo = {issue.TokenNo}, 
+                                                @p_EmpID = {issue.EmpID}, 
+                                                @p_DeviceInfo = {issue.DeviceInfo}
+                                        ");
+
                 return true;
             }
             catch (Exception ex)
@@ -288,8 +345,14 @@ namespace VHEmpAPI.Models.Repository
         {
             try
             {
-                string sqlStr = "exec dbo.EmpApp_ForceUpdateYN";
-                var IsValidNo = await AppDbContextAdm.ForceUpdateYN.FromSqlRaw(sqlStr).ToListAsync();
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_ForceUpdateYN";
+                //var IsValidNo = await AppDbContextAdm.ForceUpdateYN.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var IsValidNo = await AppDbContextAdm.ForceUpdateYN.FromSqlInterpolated($"EXEC dbo.EmpApp_ForceUpdateYN").ToListAsync();
                 return IsValidNo;
             }
             catch (Exception ex)

@@ -11,6 +11,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Data.SqlClient;
 
 namespace VHEmpAPI.Controllers
 {
@@ -225,7 +226,8 @@ namespace VHEmpAPI.Controllers
             }
 
             //var dashboardData = await DisplayDashboardList(Token, mobileCreds.MobileNo);
-            var dashboardData = await DisplayDashboardList(Token, LoginId);
+            //var dashboardData = await DisplayDashboardList(Token, LoginId);
+            var dashboardData = await DisplayDashboardList(IsValidToken, LoginId);
             if (dashboardData != null)
             {
                 return dashboardData;
@@ -2486,6 +2488,70 @@ namespace VHEmpAPI.Controllers
                 return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
 
             return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+        }
+
+        [HttpPost("EmpApp_Delete_InvReq_DetailSrv")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_Delete_InvReq_DetailSrv(InvReq_Del_ReqDtl invReq_Del_ReqDtl)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, invReq_Del_ReqDtl.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).FirstOrDefault()?.ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).FirstOrDefault()?.ToString();
+
+                    if (IsValid != "Y")
+                    {
+                        return Unauthorized(new
+                        {
+                            statusCode = 401,
+                            isSuccess = "false",
+                            message = "Invalid Token!",
+                            data = new { }
+                        });
+                    }
+                }
+
+                // Call repo method (which now does not return anything)
+                await employeeRepository.EmpApp_Delete_InvReq_Detail(invReq_Del_ReqDtl);
+
+                // Return success message
+                return Ok(new
+                {
+                    statusCode = 200,
+                    isSuccess = "true",
+                    message = "Record deleted successfully",
+                    data = new { }
+                });
+            }
+            catch (SqlException ex)
+            {
+                // SQL-level error
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    statusCode = 500,
+                    isSuccess = "false",
+                    message = "Database error occurred: " + ex.Message,
+                    data = new { }
+                });
+            }
+            catch (Exception ex)
+            {
+                // General error
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    statusCode = 500,
+                    isSuccess = "false",
+                    message = "Something went wrong: " + ex.Message,
+                    data = new { }
+                });
+            }
         }
 
 

@@ -847,6 +847,15 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class InvReq_Del_ReqDtl
+        {
+            public string? LoginId { get; set; }
+            public Int64? req_sht_dtl_id { get; set; }
+            public string? UserName { get; set; }
+            public string? FormName { get; set; }
+        }
+
+        [Keyless]
         public class LoginId_EmpId_SrchDr
         {
             public string? LoginId { get; set; }

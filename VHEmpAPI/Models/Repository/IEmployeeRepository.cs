@@ -65,5 +65,6 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.Resp_InvReq_SelReq_HistDetail>> EmpApp_InvReq_SelReq_HistoryDetail(InvReq_Get_Query invReq_Get_Query);
         Task<IEnumerable<CommonProcOutputFields.Resp_id_int_name>> EmpApp_InvReq_SearchDrName(string EmpId, string LoginId, string SearchText, string Srv);
         Task<IEnumerable<CommonProcOutputFields.RespWebCreds>> Validate_Web_Creds(WebEmpMobileCreds mobileCreds);
+        Task EmpApp_Delete_InvReq_Detail(InvReq_Del_ReqDtl invReq_Del_ReqDtl);
     }
 }
