@@ -105,6 +105,7 @@ namespace VHEmpAPI.Shared
             public string? IsSuperAdmin { get; set; }
             public string? IsPharmacyUser { get; set; }
             public int? NotificationCount { get; set; }
+            public string? IsPasswordSet { get; set; }
         }
 
         [Keyless]
@@ -870,6 +871,7 @@ namespace VHEmpAPI.Shared
             public string? LoginId { get; set; }
             public string? MobileNo { get; set; }
             public string? Password { get; set; }
+            public string? FormScreen { get; set; }
         }
 
         [Keyless]
@@ -879,6 +881,13 @@ namespace VHEmpAPI.Shared
             public string? Message { get; set; }
             public string? WebEmpName { get; set; }
             public string? WebEmpId { get; set; }
+        }
+
+        [Keyless]
+        public class LoginId_FirebaseId
+        {
+            public string? LoginId { get; set; }
+            public string? FirebaseId { get; set; }
         }
     }
 }

@@ -97,6 +97,7 @@ builder.Services.AddScoped<IDBMethods, DBMethods>();
 builder.Services.AddScoped<IEmpLoginRepository, EmpLoginRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
+builder.Services.AddScoped<IGooglePlayReviewRepository, GooglePlayReviewRepository>();
 
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";

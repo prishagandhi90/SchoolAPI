@@ -227,7 +227,7 @@ namespace VHEmpAPI.Controllers
 
             //var dashboardData = await DisplayDashboardList(Token, mobileCreds.MobileNo);
             //var dashboardData = await DisplayDashboardList(Token, LoginId);
-            var dashboardData = await DisplayDashboardList(IsValidToken, LoginId);
+            var dashboardData = await DisplayDashboardList(IsValidToken, LoginId, "");
             if (dashboardData != null)
             {
                 return dashboardData;
@@ -238,13 +238,13 @@ namespace VHEmpAPI.Controllers
 
         [HttpPost("GetDashboardList")]
         [Authorize]
-        public async Task<ActionResult<dynamic>> GetDashboardList([FromBody] LoginIdNum loginIdNum)
+        public async Task<ActionResult<dynamic>> GetDashboardList([FromBody] LoginId_FirebaseId loginIdNum)
         {
             var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             string Token = WebUtility.UrlDecode(tokenNum);
             if (tokenNum != "")
             {
-                var dashboardData = await DisplayDashboardList(tokenNum, loginIdNum.LoginId);
+                var dashboardData = await DisplayDashboardList(tokenNum, loginIdNum.LoginId, loginIdNum.FirebaseId);
                 if (dashboardData != null)
                 {
                     if (dashboardData.is_valid_token != "Y")
@@ -262,7 +262,7 @@ namespace VHEmpAPI.Controllers
         }
 
         [HttpGet("DisplayDashboardList")]
-        public async Task<DashBoardList> DisplayDashboardList(string Token, string LoginId)
+        public async Task<DashBoardList> DisplayDashboardList(string Token, string LoginId, string FirebaseId)
         {
             try
             {
@@ -277,6 +277,8 @@ namespace VHEmpAPI.Controllers
                         return new DashBoardList { is_valid_token = "N" };
                     }
                 }
+
+                await employeeRepository.UpdateFirebaseId(LoginId, FirebaseId);
 
                 var result = await employeeRepository.DisplayDashboardList(TokenNum, LoginId);
                 if (result == null)
@@ -2353,7 +2355,17 @@ namespace VHEmpAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { status = "error", message = ex.Message });
+                string originalMessage = ex.Message;
+                int index = originalMessage.ToLower().IndexOf("process id");
+                string cleanMessage = index >= 0 ? originalMessage.Substring(0, index).Trim() : originalMessage;
+                //return StatusCode(500, new { status = "error", message = cleanMessage });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    statusCode = 500,
+                    isSuccess = "false",
+                    message = "Something went wrong: \n" + cleanMessage,
+                    data = new { }
+                });
             }
         }
 
@@ -2461,7 +2473,7 @@ namespace VHEmpAPI.Controllers
                 return Ok(new { statusCode = 401, isSuccess = "false", message = "Both MobileNo and Password are mandatory!", data = new { } });
             }
 
-            TokenData tokenData = new TokenData();
+            //TokenData tokenData = new TokenData();
 
             string encodedPassword = "", Pass = "", hex1 = "", stringvalue = "", hexvalue = "";
             Pass = webEmpMobileCreds.Password.Trim();
@@ -2478,6 +2490,8 @@ namespace VHEmpAPI.Controllers
             long intvalue = Convert.ToInt64(stringvalue);
             hexvalue = intvalue.ToString("X");
             webEmpMobileCreds.Password = hexvalue;
+
+            //webEmpMobileCreds.Password = EncodeDecode.EncodePasswordToBase64(webEmpMobileCreds.Password);
 
             var result = await employeeRepository.Validate_Web_Creds(webEmpMobileCreds);
 
@@ -2530,25 +2544,17 @@ namespace VHEmpAPI.Controllers
                     data = new { }
                 });
             }
-            catch (SqlException ex)
-            {
-                // SQL-level error
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    statusCode = 500,
-                    isSuccess = "false",
-                    message = "Database error occurred: " + ex.Message,
-                    data = new { }
-                });
-            }
             catch (Exception ex)
             {
+                string originalMessage = ex.Message;
+                int index = originalMessage.ToLower().IndexOf("process id");
+                string cleanMessage = index >= 0 ? originalMessage.Substring(0, index).Trim() : originalMessage;
                 // General error
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     statusCode = 500,
                     isSuccess = "false",
-                    message = "Something went wrong: " + ex.Message,
+                    message = "Something went wrong: \n" + cleanMessage,
                     data = new { }
                 });
             }

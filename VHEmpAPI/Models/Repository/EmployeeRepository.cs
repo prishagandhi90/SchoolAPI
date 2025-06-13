@@ -221,6 +221,45 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<LoginId_TokenData>)Enumerable.Empty<string>();
         }
 
+        public async Task<IEnumerable<CommonProcOutputFields.IsValidData>> UpdateFirebaseId(string LoginId, string FirebaseId)
+        {
+            try
+            {
+                #region commented Old Working codes
+
+                //string sqlStr = "exec dbo.Display_Emp_DashboardList @p_TokenNo = '" + TokenNo + "', " +
+                //                "@p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.DashboardList.FromSqlRaw(sqlStr).ToListAsync();
+
+                //var DashboardData = await AppDbContextAdm.DashboardList
+                //                                                    .FromSqlRaw(
+                //                                                        "EXEC dbo.Display_Emp_DashboardList @p_TokenNo = {0}, @p_LoginId = {1}",
+                //                                                        TokenNo,
+                //                                                        LoginId
+                //                                                    )
+                //                                                    .ToListAsync();
+
+                #endregion
+
+                var parameters = new[]
+                                    {
+                                        new SqlParameter("@p_LoginId", LoginId ?? (object)DBNull.Value),
+                                        new SqlParameter("@p_FirebaseId", FirebaseId ?? (object)DBNull.Value),
+                                    };
+
+                var DashboardData = await AppDbContextAdm.IsValidData
+                                            .FromSqlRaw("EXEC dbo.UpdateFirebaseId @p_LoginId, @p_FirebaseId", parameters)
+                                            .ToListAsync();
+
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+                return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
+            }
+            return (IEnumerable<IsValidData>)Enumerable.Empty<string>();
+        }
+
         public async Task<IEnumerable<CommonProcOutputFields.DashBoardList>> DisplayDashboardList(string TokenNo, string LoginId)
         {
             try
@@ -1468,7 +1507,8 @@ namespace VHEmpAPI.Models.Repository
                                             exec dbo.EmpApp_Validate_Web_Creds 
                                                 @p_LoginId = {mobileCreds.LoginId}, 
                                                 @p_Mobile = {mobileCreds.MobileNo}, 
-                                                @p_Password = {mobileCreds.Password}")
+                                                @p_Password = {mobileCreds.Password}, 
+                                                @p_FormScreenName = {mobileCreds.FormScreen}")
                                         .ToListAsync();
 
                 return IsValidData;
