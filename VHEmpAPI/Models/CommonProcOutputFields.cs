@@ -448,6 +448,7 @@ namespace VHEmpAPI.Shared
             public Int32? qty { get; set; }
             public string? medicine_type { get; set; }
             public string? pkg { get; set; }
+            public string? Rack { get; set; }
         }
 
         [Keyless]
