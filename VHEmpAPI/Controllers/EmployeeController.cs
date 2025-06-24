@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
+using VHEmpAPI.Shared;
 
 namespace VHEmpAPI.Controllers
 {
@@ -2563,6 +2564,409 @@ namespace VHEmpAPI.Controllers
 
         #endregion
 
+        #region Medication Sheet
+
+        [HttpPost("EmpApp_GetSpecialOrderList")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetSpecialOrderList(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAddMedicationDropdownData(EmpId, loginId_EmpId.LoginId, "SPECIAL_ORDER_TYP");
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetTemplates")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetTemplates(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAddMedicationDropdownData(EmpId, loginId_EmpId.LoginId, "MT_NAME");
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetMedicationType")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetMedicationType(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAddMedicationDropdownData(EmpId, loginId_EmpId.LoginId, "MEDICATION TYPE");
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetInstructionType")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetInstructionType(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAddMedicationDropdownData(EmpId, loginId_EmpId.LoginId, "INSTRUCTION TYPE");
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetDrTreatmentRoute")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetDrTreatmentRoute(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAddMedicationDropdownData(EmpId, loginId_EmpId.LoginId, "Dr Treatment Route");
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetDrTreatmentFrequency")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetDrTreatmentFrequency(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAddMedicationDropdownData(EmpId, loginId_EmpId.LoginId, "Dr Treatment Frequency");
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_GetDrTreatmentMaster")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetDrTreatmentMaster(DrTreatmentMaster drTreatmentMaster)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, drTreatmentMaster.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                //var result = await employeeRepository.EmpApp_GetDrTreatmentMaster(EmpId, drTreatmentMaster.LoginId, drTreatmentMaster.IpdNo, drTreatmentMaster.TreatTyp, drTreatmentMaster.UserName);
+                var result = await employeeRepository.EmpApp_GetDrTreatmentMaster("", drTreatmentMaster.LoginId, drTreatmentMaster.IpdNo, drTreatmentMaster.TreatTyp, drTreatmentMaster.UserName);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_SaveDrTreatmentMaster")]
+        //[Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_SaveDrTreatmentMaster([FromBody] Resp_DRTreatMaster drTreatmentMaster)
+        {
+            try
+            {
+                //string IsValid = "", EmpId = "";
+                //var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                //string Token = WebUtility.UrlDecode(tokenNum);
+
+                //var isValidToken = await employeeRepository.IsTokenValid(tokenNum, drTreatmentMaster.LoginId);
+                //if (isValidToken != null)
+                //{
+                //    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                //    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                //    if (IsValid != "Y")
+                //    {
+                //        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                //    }
+                //}
+
+                var result = await employeeRepository.EmpApp_SaveDrTreatmentMaster(drTreatmentMaster, "");
+                if (result == null)
+                    return NotFound();
+
+                return Ok(new
+                {
+                    statusCode = 200,
+                    IsSuccess = "true",
+                    Message = "Data saved successfully",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+        }
+
+        [HttpPost("EmpApp_GetAdmissionIdFrmIPD")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_GetAdmissionIdFrmIPD(AdmissionId admissionId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, admissionId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_GetAdmissionIdFrmIPD(EmpId, admissionId.LoginId, admissionId.IpdNo);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        [HttpPost("EmpApp_MedicationSheet_SearchMedicines")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_MedicationSheet_SearchMedicines(LoginId_EmpId_Flag loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EmpApp_MedicationSheet_SearchMedicines(EmpId, loginId_EmpId.LoginId, loginId_EmpId.Flag);
+                if (result == null)
+                    return NotFound();
+
+                if (Ok(result).StatusCode != 200 || result.Count() == 0)
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = Ok(result).StatusCode, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+            finally
+            {
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -2728,11 +3132,12 @@ namespace VHEmpAPI.Controllers
             {
                 if (!Directory.Exists(_basePath))
                 {
+                    string printBasePath = _basePath;
                     return Ok(new
                     {
                         statusCode = 404,
                         isSuccess = "false",
-                        message = "Base path does not exist. Identity: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name.ToString(),
+                        message = "Base path does not exist. Identity: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name.ToString() + " \n basePath: " + printBasePath,
                         data = new { }
                     });
                 }

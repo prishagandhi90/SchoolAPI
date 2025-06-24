@@ -67,5 +67,10 @@ namespace VHEmpAPI.Models.Repository
         Task<IEnumerable<CommonProcOutputFields.RespWebCreds>> Validate_Web_Creds(WebEmpMobileCreds mobileCreds);
         Task EmpApp_Delete_InvReq_Detail(InvReq_Del_ReqDtl invReq_Del_ReqDtl);
         Task<IEnumerable<CommonProcOutputFields.IsValidData>> UpdateFirebaseId(string LoginId, string FirebaseId);
+        Task<IEnumerable<CommonProcOutputFields.Ddl_Value_Nm>> EmpApp_GetAddMedicationDropdownData(string EmpId, string LoginId, string flag);
+        Task<IEnumerable<CommonProcOutputFields.Resp_DRTreatMaster>> EmpApp_GetDrTreatmentMaster(string EmpId, string LoginId, string IpdNo, string TreatTyp, string UserName);
+        Task<Resp_DRTreatMaster> EmpApp_SaveDrTreatmentMaster(Resp_DRTreatMaster entity, string empId);
+        Task<int> EmpApp_GetAdmissionIdFrmIPD(string EmpId, string LoginId, string IpdNo);
+        Task<IEnumerable<CommonProcOutputFields.Resp_txt_name_value>> EmpApp_MedicationSheet_SearchMedicines(string EmpId, string LoginId, string SearchText);
     }
 }

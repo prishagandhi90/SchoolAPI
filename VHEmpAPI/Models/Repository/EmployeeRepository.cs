@@ -1550,6 +1550,177 @@ namespace VHEmpAPI.Models.Repository
 
         #endregion
 
+        #region Medication Sheet
+
+
+        public async Task<IEnumerable<CommonProcOutputFields.Ddl_Value_Nm>> EmpApp_GetAddMedicationDropdownData(string EmpId, string LoginId, string flag)
+        {
+            try
+            {
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_GetExternalLabNm @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_id_name.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Ddl_Value_Nm
+                                            .FromSqlInterpolated($"exec dbo.EMPApp_Getdata_DrPres_Medicationsheet @p_LoginId = {LoginId}, @p_EmpId = {EmpId}, @p_flag = {flag} ")
+                                            .ToListAsync();
+
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Ddl_Value_Nm>)Enumerable.Empty<string>();
+        }
+
+        public async Task<int> EmpApp_GetAdmissionIdFrmIPD(string EmpId, string LoginId, string IpdNo)
+        {
+            try
+            {
+                var resultList = await AppDbContextAdm.Resp_Id
+                    .FromSqlInterpolated($"exec dbo.EmpApp_GetAdmissionIdFrmIPD @p_LoginId = {LoginId}, @p_EmpId = {EmpId}, @p_IpdNo = {IpdNo}")
+                    .ToListAsync();
+
+                // If result found, get the Value field as int
+                if (resultList != null && resultList.Any())
+                {
+                    var admissionIdStr = resultList.FirstOrDefault()?.Id.ToString();
+                    if (int.TryParse(admissionIdStr, out int admissionId))
+                    {
+                        return admissionId;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Optionally log exception
+                Console.WriteLine("Error fetching AdmissionId from IPDNo: " + ex.Message);
+            }
+
+            return 0; // fallback if nothing found or error occurred
+        }
+
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_DRTreatMaster>> EmpApp_GetDrTreatmentMaster(string EmpId, string LoginId, string IpdNo, string TreatTyp, string UserName)
+        {
+            try
+            {
+                //var DashboardData = await AppDbContextAdm.Resp_DRTreatMaster
+                //                            .FromSqlInterpolated($@"exec dbo.EmpApp_GetDrTreatmentMaster @p_LoginId = {LoginId}, @p_EmpId = {EmpId},
+                //                                                  @p_IpdNo = {IpdNo}, @p_TreatTyp = {TreatTyp}, @p_UserName = {UserName} ")
+                //                            .ToListAsync();
+
+                //return DashboardData;
+
+                // Step 1: Call main treatment master
+                var masterList = await AppDbContextAdm.Resp_DRTreatMaster
+                                        .FromSqlInterpolated($@"EXEC dbo.EmpApp_GetDrTreatmentMaster 
+                                                         @p_LoginId = {LoginId}, 
+                                                         @p_EmpId = {EmpId},
+                                                         @p_IpdNo = {IpdNo}, 
+                                                         @p_TreatTyp = {TreatTyp}, 
+                                                         @p_UserName = {UserName}")
+                                        .ToListAsync();
+
+                // Step 2: For each master row, fetch its detail
+                foreach (var master in masterList)
+                {
+                    var details = await AppDbContextAdm.Resp_DRTreatDetail
+                                        .FromSqlInterpolated($@"EXEC dbo.EmpApp_GetDrTreatmentDetail 
+                                                         @p_MstId = {master.DRMstId}")
+                                        .ToListAsync();
+
+                    master.Detail = details;
+
+                    // Optional formatting
+                    master.FormateData();
+                    foreach (var d in details)
+                    {
+                        d.FormateData();
+                    }
+                }
+
+                return masterList;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_DRTreatMaster>)Enumerable.Empty<string>();
+        }
+
+        public async Task<Resp_DRTreatMaster> EmpApp_SaveDrTreatmentMaster(Resp_DRTreatMaster entity, string empId)
+        {
+            try
+            {
+                var dp = new DynamicParameters();
+                dp.Add("@p_doc_treat_mst_idn", entity.DRMstId, DbType.Int32, ParameterDirection.InputOutput);
+                dp.Add("@p_admission_idn", entity.AdmissionId, DbType.Int32, ParameterDirection.Input);
+                dp.Add("@p_dte", entity.Date, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_rmk", entity.Remark, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_indoor_record_type", entity.IndoorRecordType?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_usr_nm", entity.UserName, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_trm_nm", entity.TerminalName, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_action", entity.Action, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_special_order", entity.SpecialOrder, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_provisional_diagnosis", entity.ProvisionalDiagnosis, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_wght", entity.Weight, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_TemplateName", entity.TemplateName, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_PrescriptionType", entity.PrescriptionType, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_Precedence", entity.Precedence, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_PatientName", entity.PatientName, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dob", entity.DOB, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_Age", entity.Age, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_CommunicationNumber", entity.CommunicationNumber, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_ConsDrId", entity.ConsDr?.Id, DbType.Int32, ParameterDirection.Input);
+                dp.Add("@p_frm_emergency", entity.FrmEmerg, DbType.String, ParameterDirection.Input);
+
+                using (var conn = AppDbContextAdm.Database.GetDbConnection())
+                {
+                    await conn.ExecuteAsync("WEBPACEDATA2019.dbo.pop_doc_treat_mst", dp, commandType: CommandType.StoredProcedure);
+                    entity.DRMstId = dp.Get<int>("@p_doc_treat_mst_idn");
+                }
+
+                entity.FormateData();
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<CommonProcOutputFields.Resp_txt_name_value>> EmpApp_MedicationSheet_SearchMedicines(string EmpId, string LoginId, string SearchText)
+        {
+            try
+            {
+                #region commented old working code
+
+                //string sqlStr = "exec dbo.EmpApp_InvReq_SearchService @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "' ";
+                //var DashboardData = await AppDbContextAdm.Resp_txt_name_val.FromSqlRaw(sqlStr).ToListAsync();
+
+                #endregion
+
+                var DashboardData = await AppDbContextAdm.Resp_txt_name_val
+                                            .FromSqlInterpolated($"exec dbo.EmpApp_Medsheet_SearchFormularyMedicines @p_EmpId = {EmpId}, @p_LoginId = {LoginId}, @p_SearchText = {SearchText}")
+                                            .ToListAsync();
+
+                return DashboardData;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return (IEnumerable<Resp_txt_name_value>)Enumerable.Empty<string>();
+        }
+
+
+        #endregion
+
 
         #endregion
 

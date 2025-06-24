@@ -890,5 +890,266 @@ namespace VHEmpAPI.Shared
             public string? LoginId { get; set; }
             public string? FirebaseId { get; set; }
         }
+
+        [Keyless]
+        public class ListOfItem
+        {
+            public long? Id { get; set; }
+            public string? Name { get; set; }
+            public string? Value { get; set; }
+            public int? Sort { get; set; }
+            public string? Txt { get; set; }
+            public long? ParentId { get; set; }
+            public string? sup_name { get; set; }
+            public DateTime? DateValue { get; set; }
+        }
+
+        [Keyless]
+        public class DrTreatmentMaster
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public string? IpdNo { get; set; }
+            public string? TreatTyp { get; set; }
+            public string? UserName { get; set; }
+        }
+
+        [Keyless]
+        public class Resp_DRTreatMaster
+        {
+            public int? AdmissionId { get; set; }
+            public int? DRMstId { get; set; }
+            public string? IRT { get; set; }
+            public DateTime? Date { get; set; }
+            public string? Remark { get; set; }
+            public int? SRNo { get; set; }
+            public DateTime? SysDate { get; set; }
+            public string? UserName { get; set; }
+            public string? TerminalName { get; set; }
+            public string? SpecialOrder { get; set; }
+            public string? ProvisionalDiagnosis { get; set; }
+            public string? Weight { get; set; }
+            public string? TemplateName { get; set; }
+            public string? PrescriptionType { get; set; }
+            public string? Precedence { get; set; }
+            public string? StatusTyp { get; set; }
+            public string? IsAlw { get; set; }
+            public string? Age { get; set; }
+            public string? PatientName { get; set; }
+            public string? CommunicationNumber { get; set; }
+            public string? ConsDrName { get; set; }
+            public int? ConsDrId { get; set; }
+            public DateTime? DOB { get; set; }
+            public string? FrmEmerg { get; set; }
+            public DataRowState? RowState { get; set; } = DataRowState.Unchanged;
+            public List<Resp_DRTreatDetail?> Detail { get; set; }
+            [NotMapped]
+            public ListOfItem? IndoorRecordType { get; set; }
+            public string? Action { get; set; }
+            [NotMapped]
+            public ListOfItem? ConsDr { get; set; }
+            public bool? IsValid { get; set; } = true;
+            public int? IudId { get; set; }
+            public string? GridName { get; set; } = "DrTMaster";
+            public Guid? GUID { get; set; } = Guid.NewGuid();
+            public int? TmplId { get; set; }
+            public string? TmplName { get; set; }
+            public void FormateData()
+            {
+                IndoorRecordType = new ListOfItem
+                {
+                    Name = IRT
+                };
+                ConsDr = new ListOfItem
+                {
+                    Name = ConsDrName,
+                    Id = ConsDrId
+                };
+            }
+        }
+
+        [Keyless]
+        public class Resp_DRTreatDetail
+        {
+            public int? DRDtlId { get; set; }
+            public int? DRMstId { get; set; }
+            [NotMapped]
+            public ListOfItem? MedicineType { get; set; }
+            public int? Days { get; set; }
+            [NotMapped]
+            public ListOfItem? ItemName { get; set; }
+            public string? ItemNameMnl { get; set; }
+            public int? Qty { get; set; }
+            public string? Dose { get; set; }
+            [NotMapped]
+            public ListOfItem? Route { get; set; }
+            [NotMapped]
+            public ListOfItem? Frequency1 { get; set; }
+            [NotMapped]
+            public ListOfItem? Frequency2 { get; set; }
+            [NotMapped]
+            public ListOfItem? Frequency3 { get; set; }
+            [NotMapped]
+            public ListOfItem? Frequency4 { get; set; }
+            public string? Remark { get; set; }
+            public DateTime? Dose1 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy1 { get; set; }
+            public DateTime? Dose2 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy2 { get; set; }
+            public DateTime? Dose3 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy3 { get; set; }
+            public DateTime? Dose4 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy4 { get; set; }
+            public DateTime? Dose5 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy5 { get; set; }
+            public DateTime? Dose6 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy6 { get; set; }
+            public DateTime? Dose7 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy7 { get; set; }
+            public DateTime? Dose8 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy8 { get; set; }
+            public DateTime? Dose9 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy9 { get; set; }
+            public DateTime? Dose10 { get; set; }
+            [NotMapped]
+            public ListOfItem? DoseGivenBy10 { get; set; }
+            public string? UserName { get; set; }
+            public DateTime? SysDate { get; set; }
+            public string? TerminalName { get; set; }
+            [NotMapped]
+            public ListOfItem? Instruction_typ { get; set; }
+            public string? Action { get; set; }
+            public DateTime? StopTime { get; set; }
+            public string? FlowRate { get; set; }
+            public bool? IsValid { get; set; } = true;
+            public int? IudId { get; set; }
+            public DataRowState? RowState { get; set; } = DataRowState.Unchanged;
+            public Guid? GUID { get; set; } = Guid.NewGuid();
+            public string? GridName { get; set; } = "DrTDetail";
+            public string? Freq1 { get; set; }
+            public string? Freq2 { get; set; }
+            public string? Freq3 { get; set; }
+            public string? Freq4 { get; set; }
+            public string? RouteName { get; set; }
+            public string? MedicationName { get; set; }
+            public string? DGivenBy1 { get; set; }
+            public string? DGivenBy2 { get; set; }
+            public string? DGivenBy3 { get; set; }
+            public string? DGivenBy4 { get; set; }
+            public string? DGivenBy5 { get; set; }
+            public string? DGivenBy6 { get; set; }
+            public string? DGivenBy7 { get; set; }
+            public string? DGivenBy8 { get; set; }
+            public string? DGivenBy9 { get; set; }
+            public string? DGivenBy10 { get; set; }
+            public string? ItemTxt { get; set; }
+            public string? Item { get; set; }
+            public string? InstType { get; set; }
+            public string? FlowRt { get; set; }
+
+            public void FormateData()
+            {
+                Frequency1 = new ListOfItem
+                {
+                    Name = Freq1
+                };
+                Frequency2 = new ListOfItem
+                {
+                    Name = Freq2
+                };
+                Frequency3 = new ListOfItem
+                {
+                    Name = Freq3
+                };
+                Frequency4 = new ListOfItem
+                {
+                    Name = Freq4
+                };
+                MedicineType = new ListOfItem
+                {
+                    Name = MedicationName
+                };
+                Route = new ListOfItem
+                {
+                    Name = RouteName
+                };
+                DoseGivenBy1 = new ListOfItem
+                {
+                    Name = DGivenBy1
+                };
+                DoseGivenBy2 = new ListOfItem
+                {
+                    Name = DGivenBy2
+                };
+                DoseGivenBy3 = new ListOfItem
+                {
+                    Name = DGivenBy3
+                };
+                DoseGivenBy4 = new ListOfItem
+                {
+                    Name = DGivenBy4
+                };
+                DoseGivenBy5 = new ListOfItem
+                {
+                    Name = DGivenBy5
+                };
+                DoseGivenBy6 = new ListOfItem
+                {
+                    Name = DGivenBy6
+                };
+                DoseGivenBy7 = new ListOfItem
+                {
+                    Name = DGivenBy7
+                };
+                DoseGivenBy8 = new ListOfItem
+                {
+                    Name = DGivenBy8
+                };
+                DoseGivenBy9 = new ListOfItem
+                {
+                    Name = DGivenBy9
+                };
+                DoseGivenBy10 = new ListOfItem
+                {
+                    Name = DGivenBy10
+                };
+                ItemName = new ListOfItem
+                {
+                    Name = Item,
+                    Txt = ItemTxt
+                };
+                Instruction_typ = new ListOfItem
+                {
+                    Name = InstType
+                };
+                //FlowRate = new ListOfItem
+                //{
+                //    Name = FlowRt
+                //};
+            }
+        }
+    }
+
+    [Keyless]
+    public class AdmissionId
+    {
+        public string? LoginId { get; set; }
+        public string? EmpId { get; set; }
+        public string? IpdNo { get; set; }
+    }
+
+    [Keyless]
+    public class Resp_Id
+    {
+        public int? Id { get; set; }
     }
 }

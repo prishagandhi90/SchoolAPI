@@ -35,6 +35,10 @@ namespace VHEmpAPI.Models
         public DbSet<Ddl_Value_Nm>? Ddl_Value_Nm { get; set; }
 
         [NotMapped]
+        public DbSet<Resp_Id>? Resp_Id { get; set; }
+        
+
+        [NotMapped]
         public DbSet<Resp_MispunchDtl_EmpInfo>? Resp_MispunchDtl_EmpInfo { get; set; }
 
         [NotMapped]
@@ -128,6 +132,15 @@ namespace VHEmpAPI.Models
 
         [NotMapped]
         public DbSet<RespWebCreds> RespWebCreds { get; set; }
+
+        [NotMapped]
+        public DbSet<ListOfItem>? Resp_ListOfItem { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_DRTreatMaster>? Resp_DRTreatMaster { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_DRTreatDetail>? Resp_DRTreatDetail { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
