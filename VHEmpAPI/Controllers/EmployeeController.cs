@@ -302,7 +302,7 @@ namespace VHEmpAPI.Controllers
 
         #region Payroll Module
 
-        
+
         #region Attendance Summary and Detail and Mispunch logic
 
         [HttpPost("GetMonthYr_EmpInfo")]
@@ -1621,7 +1621,7 @@ namespace VHEmpAPI.Controllers
             }
         }
 
-        
+
 
         #region Module & Screen Rights
 
@@ -2097,10 +2097,10 @@ namespace VHEmpAPI.Controllers
         }
 
         #endregion
-        
+
         #region Investigation Requisition
 
-        
+
         [HttpPost("EmpApp_GetExternalLabName")]
         [Authorize]
         public async Task<ActionResult<dynamic>> EmpApp_GetExternalLabName(LoginId_EmpId loginId_EmpId)
@@ -2886,6 +2886,45 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("EmpApp_SaveAddMedicinesSheet")]
+        //[Authorize]
+        public async Task<ActionResult<dynamic>> EmpApp_SaveAddMedicinesSheet([FromBody] Resp_DRTreatDetail drTreatDetail)
+        {
+            try
+            {
+                //string IsValid = "", EmpId = "";
+                //var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                //string Token = WebUtility.UrlDecode(tokenNum);
+
+                //var isValidToken = await employeeRepository.IsTokenValid(tokenNum, drTreatmentMaster.LoginId);
+                //if (isValidToken != null)
+                //{
+                //    IsValid = isValidToken.Select(x => x.IsValid).ToList()[0].ToString();
+                //    EmpId = isValidToken.Select(x => x.UserId).ToList()[0].ToString();
+                //    if (IsValid != "Y")
+                //    {
+                //        return Ok(new { statusCode = 401, isSuccess = "false", message = "Invalid Token!", data = new { } });
+                //    }
+                //}
+
+                var result = await employeeRepository.EmpApp_SaveAddMedicinesSheet(drTreatDetail, "");
+                if (result == null)
+                    return NotFound();
+
+                return Ok(new
+                {
+                    statusCode = 200,
+                    IsSuccess = "true",
+                    Message = "Data saved successfully",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message.ToString());
+            }
+        }
+
         [HttpPost("EmpApp_GetAdmissionIdFrmIPD")]
         [Authorize]
         public async Task<ActionResult<dynamic>> EmpApp_GetAdmissionIdFrmIPD(AdmissionId admissionId)
@@ -2966,7 +3005,118 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("EmpApp_MedicationSheet_DeleteMedicines")]
+        public async Task<IActionResult> EmpApp_MedicationSheet_DeleteMedicines([FromBody] Resp_MedSheet_Del resp_MedSheet_Del)
+        {
+            try
+            {
+                var result = await employeeRepository.DeleteDoctorTreatmentDetailAsync(resp_MedSheet_Del.mstId, resp_MedSheet_Del.dtlId, resp_MedSheet_Del.UserName);
+
+                if (result)
+                {
+                    return Ok(new
+                    {
+                        statusCode = 200,
+                        IsSuccess = "true",
+                        Message = "Data deleted successfully",
+                        data = new { }
+                    });
+                }
+
+
+                return NotFound(new { message = "Record not found or already deleted." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting treatment detail.", details = ex.Message });
+            }
+
+        }
+
         #endregion
+
+        #region Dietician Checklist
+
+        [HttpPost("EMPApp_Getdata_DieticianChecklist")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EMPApp_Getdata_DieticianChecklist(DieticianChecklist_I dieticianChecklist_I)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, dieticianChecklist_I.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).FirstOrDefault()?.ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).FirstOrDefault()?.ToString();
+
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, IsSuccess = "false", Message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                //var result = await employeeRepository.EMPApp_Getdata_DieticianChecklist(EmpId, dieticianChecklist_I.LoginId);
+                List<Resp_DieticianChecklist> result = new List<Resp_DieticianChecklist>();
+                if (dieticianChecklist_I != null)
+                    result = (List<Resp_DieticianChecklist>)await employeeRepository.EMPApp_Getdata_DieticianChecklist(EmpId, dieticianChecklist_I.LoginId, dieticianChecklist_I.PrefixText, dieticianChecklist_I.Wards, dieticianChecklist_I.Floors, dieticianChecklist_I.Beds);
+                else
+                    result = (List<Resp_DieticianChecklist>)await employeeRepository.EMPApp_Getdata_DieticianChecklist(EmpId, dieticianChecklist_I.LoginId, dieticianChecklist_I.PrefixText, new List<string>(), new List<string>(), new List<string>());
+
+
+                if (result == null || !result.Any())
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = 200, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost("EMPApp_GetWardNm_Cnt_DieticianChecklist")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> EMPApp_GetWardNm_Cnt_DieticianChecklist(LoginId_EmpId loginId_EmpId)
+        {
+            try
+            {
+                string IsValid = "", EmpId = "";
+                var tokenNum = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string Token = WebUtility.UrlDecode(tokenNum);
+
+                var isValidToken = await employeeRepository.IsTokenValid(tokenNum, loginId_EmpId.LoginId);
+                if (isValidToken != null)
+                {
+                    IsValid = isValidToken.Select(x => x.IsValid).FirstOrDefault()?.ToString();
+                    EmpId = isValidToken.Select(x => x.UserId).FirstOrDefault()?.ToString();
+
+                    if (IsValid != "Y")
+                    {
+                        return Ok(new { statusCode = 401, IsSuccess = "false", Message = "Invalid Token!", data = new { } });
+                    }
+                }
+
+                var result = await employeeRepository.EMPApp_GetWardNm_Cnt_DieticianChecklist(EmpId, loginId_EmpId.LoginId);
+
+                if (result == null || !result.Any())
+                    return Ok(new { statusCode = 400, IsSuccess = "false", Message = "Bad Request or No data found!", data = new { } });
+
+                return Ok(new { statusCode = 200, IsSuccess = "true", Message = "Data fetched successfully", data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+
+        #endregion
+
 
         #endregion
 

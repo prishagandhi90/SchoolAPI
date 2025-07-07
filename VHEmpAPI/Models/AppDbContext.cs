@@ -142,6 +142,14 @@ namespace VHEmpAPI.Models
         [NotMapped]
         public DbSet<Resp_DRTreatDetail>? Resp_DRTreatDetail { get; set; }
 
+        [NotMapped]
+        public DbSet<Resp_DieticianChecklist>? Resp_DieticianChecklist { get; set; }
+
+        [NotMapped]
+        public DbSet<Resp_WardWiseChecklistCount>? Resp_WardWiseChecklistCount { get; set; }
+
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -72,5 +72,10 @@ namespace VHEmpAPI.Models.Repository
         Task<Resp_DRTreatMaster> EmpApp_SaveDrTreatmentMaster(Resp_DRTreatMaster entity, string empId);
         Task<int> EmpApp_GetAdmissionIdFrmIPD(string EmpId, string LoginId, string IpdNo);
         Task<IEnumerable<CommonProcOutputFields.Resp_txt_name_value>> EmpApp_MedicationSheet_SearchMedicines(string EmpId, string LoginId, string SearchText);
+        Task<Resp_DRTreatDetail> EmpApp_SaveAddMedicinesSheet(Resp_DRTreatDetail Entity, string empId);
+        Task<bool> DeleteDoctorTreatmentDetailAsync(int mstId, int dtlId, string userName);
+
+        Task<IEnumerable<Resp_DieticianChecklist>> EMPApp_Getdata_DieticianChecklist(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds);
+        Task<IEnumerable<Resp_WardWiseChecklistCount>> EMPApp_GetWardNm_Cnt_DieticianChecklist(string EmpId, string LoginId);
     }
 }

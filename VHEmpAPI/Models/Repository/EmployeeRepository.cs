@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Google.Apis.AndroidPublisher.v3.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,10 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.Data;
 using System.Net;
+using System.Runtime.Intrinsics.Arm;
 using VHEmpAPI.Interfaces;
 using VHEmpAPI.Shared;
+using static Dapper.SqlMapper;
 using static VHEmpAPI.Shared.CommonProcOutputFields;
 
 namespace VHEmpAPI.Models.Repository
@@ -1694,6 +1697,89 @@ namespace VHEmpAPI.Models.Repository
             }
         }
 
+        public async Task<Resp_DRTreatDetail> EmpApp_SaveAddMedicinesSheet(Resp_DRTreatDetail Entity, string empId)
+        {
+            try
+            {
+                TimeZoneInfo istZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+                var dose1InIst = Entity.Dose1.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose1.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose2InIst = Entity.Dose2.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose2.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose3InIst = Entity.Dose3.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose3.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose4InIst = Entity.Dose4.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose4.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose5InIst = Entity.Dose5.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose5.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose6InIst = Entity.Dose6.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose6.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose7InIst = Entity.Dose7.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose7.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose8InIst = Entity.Dose8.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose8.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose9InIst = Entity.Dose9.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose9.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var dose10InIst = Entity.Dose10.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.Dose10.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+                var stopTimeInIst = Entity.StopTime.HasValue ? TimeZoneInfo.ConvertTimeFromUtc(Entity.StopTime.Value.ToUniversalTime(), istZone) : (DateTime?)null;
+
+                var dp = new DynamicParameters();
+                dp.Add("@p_doc_treat_dtl_idn", Entity.DRDtlId, DbType.Int32, ParameterDirection.Input);
+                dp.Add("@p_doc_treat_dtl_mst_idn", Entity.DRMstId, DbType.Int32, ParameterDirection.Input);
+                dp.Add("@p_medicine_type", Entity.MedicineType.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_ttl_days", Entity.Days, DbType.Int32, ParameterDirection.Input);
+                dp.Add("@p_item_nm", Entity.ItemName?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_item_nm_mnl", Entity.ItemNameMnl, DbType.String, ParameterDirection.Input);
+
+                dp.Add("@p_qty", Entity.Qty, DbType.Int32, ParameterDirection.Input);
+                dp.Add("@p_dose", Entity.Dose, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_route_typ", Entity?.Route?.Name, DbType.String, ParameterDirection.Input);
+
+                dp.Add("@p_frequency_1", Entity.Frequency1?.Name != null ? Convert.ToDecimal(Entity.Frequency1.Name) : (decimal?)null, DbType.Decimal, ParameterDirection.Input);
+                dp.Add("@p_frequency_2", Entity.Frequency2?.Name != null ? Convert.ToDecimal(Entity.Frequency2.Name) : (decimal?)null, DbType.Decimal, ParameterDirection.Input);
+                dp.Add("@p_frequency_3", Entity.Frequency3?.Name != null ? Convert.ToDecimal(Entity.Frequency3.Name) : (decimal?)null, DbType.Decimal, ParameterDirection.Input);
+                dp.Add("@p_frequency_4", Entity.Frequency4?.Name != null ? Convert.ToDecimal(Entity.Frequency4.Name) : (decimal?)null, DbType.Decimal, ParameterDirection.Input);
+                dp.Add("@p_rmk", Entity.Remark, DbType.String, ParameterDirection.Input);
+
+                dp.Add("@p_dose_1", dose1InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_1", Entity.DoseGivenBy1?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_2", dose2InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_2", Entity.DoseGivenBy2?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_3", dose3InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_3", Entity.DoseGivenBy3?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_4", dose4InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_4", Entity.DoseGivenBy4?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_5", dose5InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_5", Entity.DoseGivenBy5?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_6", dose6InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_6", Entity.DoseGivenBy6?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_7", dose7InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_7", Entity.DoseGivenBy7?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_8", dose8InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_8", Entity.DoseGivenBy8?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_9", dose9InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_9", Entity.DoseGivenBy9?.Name, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_dose_10", dose10InIst, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_dose_given_by_10", Entity.DoseGivenBy10?.Name, DbType.String, ParameterDirection.Input);
+
+                dp.Add("@p_usr_nm", Entity.UserName, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_trm_nm", Entity.TerminalName, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_instruction_typ", Entity.Instruction_typ?.Name, DbType.String, ParameterDirection.Input);
+                if (Entity.StopTime != null)
+                    dp.Add("@p_stop_time", stopTimeInIst, DbType.DateTime, ParameterDirection.Input);
+                else
+                    dp.Add("@p_stop_time", null, DbType.DateTime, ParameterDirection.Input);
+                dp.Add("@p_flow_rate", Entity.FlowRate, DbType.String, ParameterDirection.Input);
+
+                dp.Add("@p_action", Entity.Action, DbType.String, ParameterDirection.Input);
+
+                dp.Add("@p_inact_dt", null, DbType.String, ParameterDirection.Input);
+                dp.Add("@p_inact_by", null, DbType.String, ParameterDirection.Input);
+
+                using (var conn = AppDbContextAdm.Database.GetDbConnection())
+                {
+                    await conn.ExecuteAsync("WEBPACEDATA2019.dbo.pop_doc_treat_dtl", dp, commandType: CommandType.StoredProcedure);
+                }
+
+                return Entity;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<CommonProcOutputFields.Resp_txt_name_value>> EmpApp_MedicationSheet_SearchMedicines(string EmpId, string LoginId, string SearchText)
         {
             try
@@ -1718,9 +1804,111 @@ namespace VHEmpAPI.Models.Repository
             return (IEnumerable<Resp_txt_name_value>)Enumerable.Empty<string>();
         }
 
+        public async Task<bool> DeleteDoctorTreatmentDetailAsync(int mstId, int dtlId, string userName)
+        {
+            try
+            {
+                var dp = new DynamicParameters();
+                dp.Add("@p_doc_treat_dtl_idn", dtlId, DbType.Int32);
+                dp.Add("@p_doc_treat_dtl_mst_idn", mstId, DbType.Int32);
+
+                // Set all other parameters to null
+                dp.Add("@p_medicine_type", null);
+                dp.Add("@p_ttl_days", null);
+                dp.Add("@p_item_nm", null);
+                dp.Add("@p_item_nm_mnl", null);
+                dp.Add("@p_qty", null);
+                dp.Add("@p_dose", null);
+                dp.Add("@p_route_typ", null);
+                dp.Add("@p_frequency_1", null);
+                dp.Add("@p_frequency_2", null);
+                dp.Add("@p_frequency_3", null);
+                dp.Add("@p_frequency_4", null);
+                dp.Add("@p_rmk", null);
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    dp.Add($"@p_dose_{i}", null, DbType.DateTime);
+                    dp.Add($"@p_dose_given_by_{i}", null);
+                }
+
+                dp.Add("@p_usr_nm", userName);
+                dp.Add("@p_trm_nm", "");
+                dp.Add("@p_instruction_typ", null);
+                dp.Add("@p_stop_time", null);
+                dp.Add("@p_flow_rate", null);
+                dp.Add("@p_action", "Delete");
+                dp.Add("@p_inact_dt", null);
+                dp.Add("@p_inact_by", userName);
+
+                using (var conn = AppDbContextAdm.Database.GetDbConnection())
+                {
+                    await conn.ExecuteAsync("WEBPACEDATA2019.dbo.pop_doc_treat_dtl", dp, commandType: CommandType.StoredProcedure);
+                }
+                return true;
+            }
+            catch
+            {
+                // Rethrow to controller
+                throw;
+            }
+        }
+
 
         #endregion
 
+        #region Dietician Checklist
+
+        public async Task<IEnumerable<Resp_DieticianChecklist>> EMPApp_Getdata_DieticianChecklist(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds)
+        {
+            try
+            {
+                string Wards_commaSep = string.Join(",", Wards);
+                string Floors_commaSep = string.Join(",", Floors);
+                string Beds_commaSep = string.Join(",", Beds);
+                var result = await AppDbContextAdm.Resp_DieticianChecklist
+                                    .FromSqlInterpolated($@"EXEC dbo.EMPApp_Getdata_DieticianChecklist 
+                                                @p_LoginId = {LoginId}, 
+                                                @p_EmpId = {EmpId},
+                                                @p_PrefixText = {PrefixText},
+                                                @p_Wards = {Wards_commaSep}, 
+                                                @p_Floors = {Floors_commaSep},
+                                                @p_Beds = {Beds_commaSep}")
+                                    .ToListAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Logging kar lena production me
+            }
+
+            return Enumerable.Empty<Resp_DieticianChecklist>();
+        }
+
+        public async Task<IEnumerable<Resp_WardWiseChecklistCount>> EMPApp_GetWardNm_Cnt_DieticianChecklist(string EmpId, string LoginId)
+        {
+            try
+            {
+                var result = await AppDbContextAdm.Resp_WardWiseChecklistCount
+                                    .FromSqlInterpolated($@"EXEC dbo.EMPApp_GetWardNm_Cnt_DieticianChecklist 
+                                                @p_LoginId = {LoginId}, 
+                                                @p_EmpId = {EmpId}")
+                                    .ToListAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Logging kar lena production me
+            }
+
+            return Enumerable.Empty<Resp_WardWiseChecklistCount>();
+        }
+
+
+
+        #endregion
 
         #endregion
 

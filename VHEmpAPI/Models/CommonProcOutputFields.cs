@@ -346,6 +346,18 @@ namespace VHEmpAPI.Shared
         }
 
         [Keyless]
+        public class Resp_MedSheet_Del
+        {
+            public string? LoginId { get; set; }
+            public string? EmpId { get; set; }
+            public int mstId { get; set; }
+            public int dtlId { get; set; }
+            public string UserName { get; set; }
+        }
+
+        
+
+        [Keyless]
         public class LoginId_EmpId_Lv_OT_Flag
         {
             public string? LoginId { get; set; }
@@ -1151,5 +1163,49 @@ namespace VHEmpAPI.Shared
     public class Resp_Id
     {
         public int? Id { get; set; }
+    }
+
+    [Keyless]
+    public class Resp_DieticianChecklist
+    {
+        public int? Id { get; set; }
+        public string? PatientName { get; set; }
+        public string? UHIDNo { get; set; }
+        public string? IPDNo { get; set; }
+        public string? BEDNo { get; set; }
+        public string? WardName { get; set; }
+        public int? GrpSequence { get; set; }
+        public int? Sequence { get; set; }
+        public DateTime? DOA { get; set; }
+        public string? Doctor { get; set; }
+        public int? FloorNo { get; set; }
+        public string? Diagnosis { get; set; }
+        public string? Remark { get; set; }
+        public string? Username { get; set; }
+        public DateTime? SysDate { get; set; }
+        public string? DietPlan { get; set; }
+        public string? RelFood_Remark { get; set; }
+
+    }
+
+    [Keyless]
+    public class Resp_WardWiseChecklistCount
+    {
+        public string? WardName { get; set; }
+        public string? ShortWardName { get; set; }
+        public int? Grp_Seq { get; set; }
+        public int? Seq { get; set; }
+        public int? WardCount { get; set; }
+    }
+
+    [Keyless]
+    public class DieticianChecklist_I
+    {
+        public string? LoginId { get; set; }
+        public string? EmpId { get; set; }
+        public string? PrefixText { get; set; } = "";
+        public List<string>? Wards { get; set; }
+        public List<string>? Floors { get; set; }
+        public List<string>? Beds { get; set; }
     }
 }
