@@ -77,5 +77,7 @@ namespace VHEmpAPI.Models.Repository
 
         Task<IEnumerable<Resp_DieticianChecklist>> EMPApp_Getdata_DieticianChecklist(string EmpId, string LoginId, string PrefixText, List<string> Wards, List<string> Floors, List<string> Beds);
         Task<IEnumerable<Resp_WardWiseChecklistCount>> EMPApp_GetWardNm_Cnt_DieticianChecklist(string EmpId, string LoginId);
+        Task<DietChecklistMaster> EmpApp_SaveDietChecklistMaster(DietChecklistMaster entity);
+
     }
 }

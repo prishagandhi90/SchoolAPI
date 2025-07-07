@@ -3113,6 +3113,39 @@ namespace VHEmpAPI.Controllers
             }
         }
 
+        [HttpPost("EmpApp_SaveDietChecklistMaster")]
+        [Authorize]
+        public async Task<IActionResult> EmpApp_SaveDietChecklistMaster([FromBody] DietChecklistMaster entity)
+        {
+            try
+            {
+                var savedEntity = await employeeRepository.EmpApp_SaveDietChecklistMaster(entity);
+                if (savedEntity == null)
+                {
+                    return Ok(new
+                    {
+                        statusCode = 404,
+                        IsSuccess = "true",
+                        Message = "No Data found!",
+                        data = new { }
+                    });
+                }
+
+                return Ok(new
+                {
+                    statusCode = 200,
+                    IsSuccess = "true",
+                    Message = "Data saved successfully",
+                    data = savedEntity
+                });
+
+                //return Ok(new { statusCode = 200, IsSuccess = "true", Message = "Data saved successfully", data = savedEntity });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
 
         #endregion

@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using Google.Apis.AndroidPublisher.v3.Data;
+using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -730,7 +732,7 @@ namespace VHEmpAPI.Models.Repository
                 //string sqlStr = "exec dbo.EmpApp_GetShiftWeekList @p_EmpId = '" + EmpId + "', " +
                 //                "@p_LoginId = '" + LoginId + "' ";
                 //var DashboardData = await AppDbContextAdm.Resp_Value_Name.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var parameters = new[]
@@ -981,7 +983,7 @@ namespace VHEmpAPI.Models.Repository
 
                 //string sqlStr = "exec dbo.GetDrNotifications @p_LoginId = '" + loginId + "', @p_DrId = '" + EmpId + "' ";
                 //var DrNotification = await AppDbContextAdm.DrNotification.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var parameters = new[]
@@ -1074,7 +1076,7 @@ namespace VHEmpAPI.Models.Repository
                 //string sqlStr = "exec dbo.EmpApp_GetOrganizations @p_EmpId = '" + EmpId + "', " +
                 //                "@p_LoginId = '" + LoginId + "' ";
                 //var DashboardData = await AppDbContextAdm.Organizations.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var DashboardData = await AppDbContextAdm.Organizations
@@ -1104,7 +1106,7 @@ namespace VHEmpAPI.Models.Repository
                 //                "@p_PrefixText = '" + PrefixText + "', @p_Orgs = '" + Orgs_commaSep + "', " +
                 //                "@p_Floors = '" + Floors_commaSep + "', @p_Wards = '" + Wards_commaSep + "' ";
                 //var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var DashboardData = await AppDbContextAdm.PatientList
@@ -1129,7 +1131,7 @@ namespace VHEmpAPI.Models.Repository
                 //string sqlStr = "exec dbo.EmpApp_SortDeptPatientList @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', " +
                 //                "@p_SortType = '" + SortType + "' ";
                 //var DashboardData = await AppDbContextAdm.PatientList.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var DashboardData = await AppDbContextAdm.PatientList
@@ -1266,7 +1268,7 @@ namespace VHEmpAPI.Models.Repository
 
                 //string sqlStr = "exec dbo.EmpApp_InvReq_SearchService @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "' ";
                 //var DashboardData = await AppDbContextAdm.Resp_txt_name_val.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var DashboardData = await AppDbContextAdm.Resp_txt_name_val
@@ -1290,7 +1292,7 @@ namespace VHEmpAPI.Models.Repository
 
                 //string sqlStr = "exec dbo.EmpApp_InvReq_SearchDrName @p_EmpId = '" + EmpId + "', @p_LoginId = '" + LoginId + "', @p_SearchText = '" + SearchText + "', @p_Srv = '" + Srv + "' ";
                 //var DashboardData = await AppDbContextAdm.Resp_id_int_name.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var DashboardData = await AppDbContextAdm.Resp_id_int_name
@@ -1317,7 +1319,7 @@ namespace VHEmpAPI.Models.Repository
                 //                "@P_VAL_3 = '" + invReq_Get_Query.SrchService + "', @P_VAL_4 = '" + invReq_Get_Query.InvType + "', @P_VAL_5 = '" + invReq_Get_Query.SrvGrp + "', " +
                 //                "@P_VAL_6 = '" + invReq_Get_Query.ExtLabNm + "', @P_VAL_7 = '" + invReq_Get_Query.Val7 + "' ";
                 //var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_Qry.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var DashboardData = await AppDbContextAdm.Resp_InvReq_Get_Qry
@@ -1906,6 +1908,36 @@ namespace VHEmpAPI.Models.Repository
             return Enumerable.Empty<Resp_WardWiseChecklistCount>();
         }
 
+        public async Task<DietChecklistMaster> EmpApp_SaveDietChecklistMaster(DietChecklistMaster entity)
+        {
+            try
+            {
+                if (entity.Id > 0)
+                {
+                    var dp = new DynamicParameters();
+                    dp.Add("@p_id", entity.Id, DbType.Int32, ParameterDirection.Input);
+                    dp.Add("@p_diagnosis", entity.Diagnosis, DbType.String, ParameterDirection.Input);
+                    dp.Add("@p_diet", entity.Diet?.Name, DbType.String, ParameterDirection.Input);
+                    dp.Add("@p_remark", entity.Remark, DbType.String, ParameterDirection.Input);
+                    dp.Add("@p_username", entity.Username, DbType.String, ParameterDirection.Input);
+                    dp.Add("@p_rel_fd_rmrk", entity.RelFood_Remark, DbType.String, ParameterDirection.Input);
+
+                    using (var conn = AppDbContextAdm.Database.GetDbConnection())
+                    {
+                        await conn.ExecuteAsync("WEBPACEDATA2019.dbo.SaveDietChecklist", dp, commandType: CommandType.StoredProcedure);
+                    }
+
+                    return entity;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
 
 
         #endregion
@@ -1923,7 +1955,7 @@ namespace VHEmpAPI.Models.Repository
                 //string sqlStr = "exec dbo.EMPApp_GetEMPNotificationsList @p_LoginId = '" + loginId + "', @p_EmpId = '" + EmpId + "', " +
                 //                "@p_Days = " + days + ", @p_Tag = '" + tag + "', @p_FromDate = '" + fromDate + "', @p_ToDate = '" + toDate + "' ";
                 //var EmpNotificationList = await AppDbContextAdm.EMPNotifyList.FromSqlRaw(sqlStr).ToListAsync();
-                
+
                 #endregion
 
                 var EmpNotificationList = await AppDbContextAdm.EMPNotifyList
@@ -1951,7 +1983,7 @@ namespace VHEmpAPI.Models.Repository
             try
             {
                 #region commented old working code
-                
+
                 //string sqlStr = "exec dbo.EMPApp_UpdateNotification_Read @p_LoginId = '" + loginId + "', @p_NotificationId = '" + NotificationId + "' ";
                 //var EmpNotificationList = await AppDbContextAdm.IsValidData.FromSqlRaw(sqlStr).ToListAsync();
 

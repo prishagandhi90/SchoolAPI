@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static VHEmpAPI.Shared.CommonProcOutputFields;
 
 namespace VHEmpAPI.Shared
 {
@@ -1208,4 +1209,36 @@ namespace VHEmpAPI.Shared
         public List<string>? Floors { get; set; }
         public List<string>? Beds { get; set; }
     }
+
+    [Keyless]
+    public class DietChecklistMaster
+    {
+        public int? Id { get; set; }
+        public string? Diagnosis { get; set; }
+        public ListOfItem? Diet { get; set; }
+        public string? Remark { get; set; }
+        public string? RelFood_Remark { get; set; }
+        public string? Username { get; set; }
+
+        // Extra properties for UI display only (NotMapped equivalent in API layer)
+        public string? PatientName { get; set; }
+        public string? UHIDNo { get; set; }
+        public string? IPDNo { get; set; }
+        public string? BEDNo { get; set; }
+        public string? WardName { get; set; }
+        public DateTime? DOA { get; set; }
+        public string? Doctor { get; set; }
+        public string? FloorNo { get; set; }
+        public DateTime? SysDate { get; set; }
+        public string? DietPlan { get; set; }
+
+        public void FormateData()
+        {
+            Diet = new ListOfItem
+            {
+                Name = DietPlan
+            };
+        }
+    }
+
 }
