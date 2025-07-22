@@ -10,6 +10,8 @@ using VHEmpAPI;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using VHEmpAPI.DbCommon;
+using StudentAPI.Models.Repository;
+using StudentAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,10 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
 builder.Configuration.GetConnectionString("VHMobileDBConnection")
 ));
 
+builder.Services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(
+builder.Configuration.GetConnectionString("VHMobileDBConnection")
+));
+
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 builder.Services.AddControllers();
 builder.Services.AddSingleton<FirebaseService>();
@@ -98,6 +104,9 @@ builder.Services.AddScoped<IEmpLoginRepository, EmpLoginRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 builder.Services.AddScoped<IGooglePlayReviewRepository, GooglePlayReviewRepository>();
+
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+
 
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";

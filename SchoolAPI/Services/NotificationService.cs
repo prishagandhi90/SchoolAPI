@@ -24,12 +24,12 @@ public class NotificationService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            //await CheckForNewPatientsAsync();
-            await CheckForNotificationsAsync();
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
-        }
+        //while (!stoppingToken.IsCancellationRequested)
+        //{
+        //    //await CheckForNewPatientsAsync();
+        //    //await CheckForNotificationsAsync();
+        //    //await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+        //}
     }
 
     private async Task CheckForNewPatientsAsync()
